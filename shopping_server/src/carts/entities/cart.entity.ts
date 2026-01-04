@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn,Column,ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn,Column,OneToOne } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 @Entity('carts')   
 export class Cart {
@@ -8,7 +8,7 @@ export class Cart {
     @Column()
     createdAt: Date;
 
-    @ManyToOne(() => User, user => user.carts)
+    @OneToOne(() => User, user => user.cart)
     user: User;
 }
 

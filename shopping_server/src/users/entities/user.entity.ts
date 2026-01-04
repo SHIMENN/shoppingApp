@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column,OneToMany} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column,OneToMany,OneToOne} from 'typeorm';
 import { IsEmail,Min } from 'class-validator';
 import { Cart } from 'src/carts/entities/cart.entity';
+import { Order } from 'src/orders/entities/order.entity';
 @Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
-    UserId: number;
+    userId: number;
 
     @Column()
     username: string;
@@ -21,7 +22,10 @@ export class User {
     @Column()
     createdAt: Date;
 
-    @OneToMany(() => Cart, cart => cart.user)
-    carts: Cart[];
+    @OneToOne(() => Cart, cart => cart.user)
+    cart: Cart;
+
+    @OneToMany(() => Order, order => order.user)
+    orders: Order[];
 }
 

@@ -1,1 +1,22 @@
-export class Order {}
+import { Entity,PrimaryGeneratedColumn,Column,ManyToOne,OneToMany } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+
+@Entity('orders')
+export class Order {
+    @PrimaryGeneratedColumn()
+    orderId: number;
+
+    @Column()
+    orderDate: Date;
+
+    @Column()
+    totalAmount: number;
+
+    @Column()
+    status: string;
+
+    @ManyToOne(() => User, user => user.orders)
+    user: User;
+
+}
+
