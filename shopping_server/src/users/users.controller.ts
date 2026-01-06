@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Search } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { email } from 'zod';
 
 @Controller('users')
 export class UsersController {
@@ -18,8 +19,12 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  findById(@Param('id') id: string) {
+    return this.usersService.findById(+id);
+  }
+  @Get('Search')
+  findByEmail(@Query('email') email: string) {
+    return this.usersService.findByEmail(email);
   }
 
   @Patch(':id')

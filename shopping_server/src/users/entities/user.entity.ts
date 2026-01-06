@@ -1,13 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column,OneToMany,OneToOne} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column,OneToMany,OneToOne, CreateDateColumn,} from 'typeorm';
 import { IsEmail,Min } from 'class-validator';
 import { Cart } from 'src/carts/entities/cart.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import {Exclude} from 'class-transformer';
+
 @Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
     userId: number;
 
-    @Column()
+    @Column({unique:true})
     username: string;
 
     @Column({unique: true})
@@ -17,9 +19,13 @@ export class User {
 
     @Column()
     @Min(8)
+    @Exclude()
     password: string;
 
-    @Column()
+    @CreateDateColumn(
+
+        
+    )
     createdAt: Date;
 
     @OneToOne(() => Cart, cart => cart.user)
