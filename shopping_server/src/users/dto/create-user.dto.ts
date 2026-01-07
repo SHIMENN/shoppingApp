@@ -18,3 +18,4 @@ export class CreateUserDto {
     @IsString()
     createdAt: string;
 }
+  
