@@ -10,7 +10,11 @@ import { CartItemModule } from './cart-item/cart-item.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { User } from './users/entities/user.entity';
+import { Product } from './products/entities/product.entity';
+import { Order } from './orders/entities/order.entity';
+import { Cart } from './carts/entities/cart.entity';
+import { CartItem } from './cart-item/entities/cart-item.entity';
 
 @Module({
   imports: [
@@ -28,6 +32,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
+        entities: [User, Product, Order, Cart, CartItem],
         autoLoadEntities: true,
         synchronize: true,
       }),
