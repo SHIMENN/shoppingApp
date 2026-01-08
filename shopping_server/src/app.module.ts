@@ -7,13 +7,34 @@ import { CartsModule } from './carts/carts.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderItemModule } from './order-item/order-item.module';
 import { CartItemModule } from './cart-item/cart-item.module';
-import { AuthService } from './auth/auth.service';
-import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 
 @Module({
-  imports: [ UsersModule, ProductsModule, CartsModule, OrdersModule, OrderItemModule, CartItemModule, AuthModule],
-  controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+    }),
+
+     UsersModule, ProductsModule, CartsModule, OrdersModule, OrderItemModule, CartItemModule, AuthModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

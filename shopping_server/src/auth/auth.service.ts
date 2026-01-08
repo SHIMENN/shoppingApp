@@ -3,8 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/auth.dto'; 
-import { CreateCartDto } from 'src/carts/dto/create-cart.dto';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UserRole } from 'src/users/enums/roles.enum';
 
 

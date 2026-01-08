@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { register } from 'module';
 
 @Controller('auth')
 export class AuthController  {
@@ -22,7 +21,7 @@ async register(@Body()registerDto: RegisterDto){
 @UseGuards(LocalAuthGuard)
 @Post('login')
 @HttpCode(HttpStatus.OK)
-async login (@Request() req){
+async login (@Body () logindto:LoginDto,@Request() req){
     return this.authService.login(req.user);
 }
 
@@ -47,7 +46,7 @@ async loginWithCookie(
   getProfile(@Request() req) {
     return req.user;
   }
-    @Post('logout')
+  @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('access_token');
