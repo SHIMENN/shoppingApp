@@ -3,8 +3,6 @@ import { UserRole } from '../enums/roles.enum';
 
 
 export class CreateUserDto {
-    @IsString()
-    userId: number;
 
     @IsString()
     @MinLength(3)
@@ -16,9 +14,6 @@ export class CreateUserDto {
     @IsString()
     @MinLength(8)
     password: string;
-
-    @IsString()
-    createdAt: string;
 
     @IsNotEmpty()
     @IsEnum(UserRole)
