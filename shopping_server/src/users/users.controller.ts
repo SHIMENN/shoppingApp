@@ -1,18 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Search } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Search, } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { email } from 'zod';
+import { UseGuards } from '@nestjs/common/decorators';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {AdminGuard} from '../auth/guards/admin.guard';
+
 
 @Controller('users')
+@UseGuards(JwtAuthGuard) 
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
 
+
+  @Post()
+  @UseGuards(AdminGuard)
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto); // פשוט יוצר משתמש ב-DB
+  }
   @Get()
   findAll() {
     return this.usersService.findAll();

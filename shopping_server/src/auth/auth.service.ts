@@ -3,6 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/auth.dto'; 
+import { CreateCartDto } from 'src/carts/dto/create-cart.dto';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UserRole } from 'src/users/enums/roles.enum';
 
 
 @Injectable()
@@ -26,9 +29,10 @@ export class AuthService {
         return result; 
  }
     async login(user:any){
-        const payload={
+        const payload={   //jwt.strategy.ts
             email: user.email,
-            sub: user.id
+            sub: user.id,
+            role: user.role,
         };
     return {
         access_token: this.jwtService.sign(payload),
@@ -41,7 +45,11 @@ export class AuthService {
 }
 //שלב ההרשמה עם המטודה פלוס  שימוש ב   dto
 async register(registerDto:RegisterDto) {
-    const user = await this.usersService.create(registerDto);
+    const userToCreate = {
+        ...registerDto,
+        role: UserRole.USER, //תפקיד ברירת מחדל
+    };
+    const user = await this.usersService.create(userToCreate);
     
     const { password: _, ...result } = user;
     return this.login(result);

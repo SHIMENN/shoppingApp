@@ -3,6 +3,8 @@ import { IsEmail,Min } from 'class-validator';
 import { Cart } from 'src/carts/entities/cart.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import {Exclude} from 'class-transformer';
+import { UserRole } from '../enums/roles.enum';
+
 
 @Entity('users')
 export class User {
@@ -22,11 +24,12 @@ export class User {
     @Exclude()
     password: string;
 
-    @CreateDateColumn(
-
-        
-    )
+    @CreateDateColumn()
+    @CreateDateColumn()
     createdAt: Date;
+
+    @Column({type:'enum', enum:UserRole, default:UserRole.USER})
+    role: UserRole;
 
     @OneToOne(() => Cart, cart => cart.user)
     cart: Cart;
