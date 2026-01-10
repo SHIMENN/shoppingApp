@@ -8,27 +8,27 @@ export class OrderItemController {
   constructor(private readonly orderItemService: OrderItemService) {}
 
   @Post()
-  create(@Body() createOrderItemDto: CreateOrderItemDto) {
-    return this.orderItemService.create(createOrderItemDto);
+  async create(@Body() createOrderItemDto: CreateOrderItemDto) {
+    return await this.orderItemService.create(createOrderItemDto);
   }
 
   @Get()
-  findAll() {
-    return this.orderItemService.findAll();
+  async findAll() {
+    return await this.orderItemService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderItemService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.orderItemService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderItemDto: UpdateOrderItemDto) {
-    return this.orderItemService.update(+id, updateOrderItemDto);
+  async update(@Param('id') id: string, @Body() updateOrderItemDto: UpdateOrderItemDto) {
+    return await this.orderItemService.update(+id, updateOrderItemDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderItemService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.orderItemService.remove(+id);
   }
 }

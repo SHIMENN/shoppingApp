@@ -1,29 +1,48 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+   app.use(cookieParser()); 
 
-
-  app.use(cookieParser()); 
-
-  app.useGlobalPipes(new ValidationPipe({
+    app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true,
   }));
-  app.enableCors({
-    origin: 'http://localhost:3000', // Vite dev server
+
+    app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true, //  ל בושח-Cookies!
   });
 
-  const PORT = process.env.PORT || 5173;
- await app.listen(PORT, () => {
-    console.log(`--- 🚀 מאזין בכתובת: http://localhost:${PORT} ---`);
-  });
-}
+
+ const config = new DocumentBuilder()
+  .setTitle('My API')
+  .addBearerAuth(
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'JWT',
+      description: 'Enter JWT token',
+      in: 'header',
+    },
+  )
+  .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+  
+
+  const PORT = process.env.PORT || 3000;
+ await app.listen(PORT)
+console.log(`--- 🚀 מאזין בכתובת: http://localhost:${PORT} ---`);
+  }
+
 
 bootstrap();
 

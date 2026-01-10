@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart } from './entities/cart.entity';
+import { User } from '../users/entities/user.entity';
 
 
 
@@ -21,14 +22,14 @@ export class CartsService {
 
   async findAll(): Promise<Cart[]> {
     return await this.cartRepository.find({
-      relations: ['user', 'cartItems'],
+      relations: ['user', 'cartItems', 'cartItems.product'],
     });
   }
 
   async findOne(id: number): Promise<Cart> {
     const cart = await this.cartRepository.findOne({
       where: { cartId: id },
-      relations: ['user', 'cartItems'],
+      relations: ['user', 'cartItems', 'cartItems.product'],
     });
 
     if (!cart) {

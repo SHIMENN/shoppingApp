@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { OrderItem } from './entities/order-item.entity';
 
 @Injectable()
 export class OrderItemService {
-  create(createOrderItemDto: CreateOrderItemDto) {
-    return 'This action adds a new orderItem';
+  constructor(
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepository: Repository<OrderItem>,
+  ) {}
+
+  async create(createOrderItemDto: CreateOrderItemDto): Promise<OrderItem> {
+    const orderItem = this.orderItemRepository.create(createOrderItemDto);
+    return await this.orderItemRepository.save(orderItem);
   }
 
-  findAll() {
-    return `This action returns all orderItem`;
+  async findAll(): Promise<OrderItem[]> {
+    return await this.orderItemRepository.find({
+      relations: ['order', 'product'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} orderItem`;
+  async findOne(id: number): Promise<OrderItem> {
+    const orderItem = await this.orderItemRepository.findOne({
+      where: { orderItemId: id },
+      relations: ['order', 'product'],
+    });
+
+    if (!orderItem) {
+      throw new NotFoundException(`Order item with ID ${id} not found`);
+    }
+
+    return orderItem;
   }
 
-  update(id: number, updateOrderItemDto: UpdateOrderItemDto) {
-    return `This action updates a #${id} orderItem`;
+  async update(id: number, updateOrderItemDto: UpdateOrderItemDto): Promise<OrderItem> {
+    const orderItem = await this.findOne(id);
+    Object.assign(orderItem, updateOrderItemDto);
+    return await this.orderItemRepository.save(orderItem);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} orderItem`;
+  async remove(id: number): Promise<void> {
+    const orderItem = await this.findOne(id);
+    await this.orderItemRepository.remove(orderItem);
   }
 }

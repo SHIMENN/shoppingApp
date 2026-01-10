@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UseGuards } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {AdminGuard} from '../auth/guards/admin.guard';
-
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard) 

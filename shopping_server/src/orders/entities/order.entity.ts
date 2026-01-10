@@ -1,4 +1,4 @@
-import { Entity,PrimaryGeneratedColumn,Column,ManyToOne,OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { OrderItem } from 'src/order-item/entities/order-item.entity';
 
@@ -8,12 +8,15 @@ export class Order {
     orderId: number;
 
     @Column()
+    userId: number;
+
+    @CreateDateColumn()
     orderDate: Date;
 
-    @Column()
+    @Column('decimal', { precision: 10, scale: 2 })
     totalAmount: number;
 
-    @Column()
+    @Column({ default: 'pending' })
     status: string;
 
     @ManyToOne(() => User, user => user.orders)
@@ -21,6 +24,5 @@ export class Order {
 
     @OneToMany(() => OrderItem, orderItem => orderItem.order)
     orderItems: OrderItem[];
-
 }
 

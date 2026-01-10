@@ -15,6 +15,8 @@ import { Product } from './products/entities/product.entity';
 import { Order } from './orders/entities/order.entity';
 import { Cart } from './carts/entities/cart.entity';
 import { CartItem } from './cart-item/entities/cart-item.entity';
+import { OrderItem } from './order-item/entities/order-item.entity';
+
 
 @Module({
   imports: [
@@ -32,7 +34,7 @@ import { CartItem } from './cart-item/entities/cart-item.entity';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [User, Product, Order, Cart, CartItem],
+        entities: [User, Product, Order, Cart, CartItem, OrderItem],
         autoLoadEntities: true,
         synchronize: true,
       }),
