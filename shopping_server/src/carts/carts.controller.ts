@@ -2,8 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { CartsService } from './carts.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
+import { UseGuards } from '@nestjs/common/decorators';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from 'src/auth/guards/admin.guard';
 
 @Controller('carts')
+@UseGuards(JwtAuthGuard) 
+@UseGuards(AdminGuard)
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}
 

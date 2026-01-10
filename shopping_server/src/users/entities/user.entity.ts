@@ -24,11 +24,11 @@ export class User {
     @Exclude()
     password: string;
 
-    @CreateDateColumn()
+
     @CreateDateColumn()
     createdAt: Date;
 
-    @Column({type:'enum', enum:UserRole, default:UserRole.USER})
+    @Column()
     role: UserRole;
 
     @OneToOne(() => Cart, cart => cart.user)

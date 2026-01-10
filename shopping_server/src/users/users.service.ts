@@ -5,25 +5,33 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-
+import { CartsService } from 'src/carts/carts.service';
 
 @Injectable()
 export class UsersService {
 
   constructor (
     @InjectRepository(User)//עטיפה בריפוזיטורי של typeorm
-    private  usersRepository: Repository<User>,) {}
+    private  usersRepository: Repository<User>,
+    private cartsService: CartsService,
+  ) {}
+
 
 
   //יצירת משתמש פלוס הצפנת סיסמא
   async create(createUserDto: CreateUserDto):Promise<User> {
     const {password, ...userData} = createUserDto;
     const hashedPassword =await bcrypt.hash(password,10);
+
+
     const user =this.usersRepository.create({
       ...userData,
       password:hashedPassword,
-    })
-    return this.usersRepository.save(user);
+    });
+
+    const  savedUser= await this.usersRepository.save(user);
+    await this.cartsService.create(savedUser);
+    return savedUser;
 
   
   }
