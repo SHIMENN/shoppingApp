@@ -15,10 +15,20 @@ export class CartsService {
     private readonly cartRepository: Repository<Cart>,
   ) {}
 
-  async create(createCartDto: CreateCartDto): Promise<Cart> {
-    const cart = this.cartRepository.create(createCartDto);
-    return await this.cartRepository.save(cart);
-  }
+
+async create(createCartDto: CreateCartDto, userId: number): Promise<Cart> {
+    const existingCart = await this.cartRepository.findOne({
+        where: { userUserId:Number (userId) }
+    });
+    if (existingCart) {
+        return existingCart; 
+    }
+    const newCart = this.cartRepository.create({
+        ...createCartDto,
+        userUserId: userId  
+    });
+    return await this.cartRepository.save(newCart);
+}
 
   async findAll(): Promise<Cart[]> {
     return await this.cartRepository.find({

@@ -30,7 +30,7 @@ export class UsersService {
     });
 
     const  savedUser= await this.usersRepository.save(user);
-    await this.cartsService.create(savedUser);
+    await this.cartsService.create({},savedUser.userId);
     return savedUser;
 
   

@@ -4,8 +4,7 @@ import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@
 export class AdminGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const { user } = context.switchToHttp().getRequest();
-
-    if (user?.role !== 'admin') {
+    if (!user || user.role !== 'admin') {
       throw new ForbiddenException('נדרשות הרשאות מנהל');
     }
 

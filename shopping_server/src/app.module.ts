@@ -37,6 +37,8 @@ import { OrderItem } from './order-item/entities/order-item.entity';
         entities: [User, Product, Order, Cart, CartItem, OrderItem],
         autoLoadEntities: true,
         synchronize: true,
+        logging: true,
+        
       }),
     }),
 

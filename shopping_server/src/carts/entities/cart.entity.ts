@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn,CreateDateColumn,OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn,CreateDateColumn,OneToMany, Column } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { CartItem } from 'src/cart-item/entities/cart-item.entity';
 
@@ -10,8 +10,13 @@ export class Cart {
     @CreateDateColumn()
     createdAt: Date;
 
+    // עמודה מספרית פשוטה - בלי insert: false!
+    @Column({ nullable: true })
+    userUserId: number;
+
+    // הקשר משתמש בדיוק באותה עמודה (userId)
     @OneToOne(() => User, user => user.cart)
-    @JoinColumn()
+    @JoinColumn({ name: 'userUserId' }) 
     user: User;
 
     @OneToMany(() => CartItem, cartItem => cartItem.cart)

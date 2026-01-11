@@ -29,18 +29,21 @@ async login (@Body () logindto:LoginDto,@Request() req){
 @Post('login-cookie')
 @HttpCode(HttpStatus.OK)
 async loginWithCookie(
+    @Body() loginDto: LoginDto,
     @Request()req,
     @Res({passthrough: true}) response: Response,
 ){
-    const  {access_token, user} = await this.authService.login(req.user);
+    const  {access_token, user} = await this.authService.login(loginDto);
     response.cookie('access_token',access_token,{
         httpOnly: true,
         secure: process.env.NODE_ENV ===  'production',
         sameSite: 'strict',
-        maxAge: 1000*24*24*60,
+        maxAge: 1000 * 60 * 60, // 1 hour
     });
     return{user};
 }
+
+
  @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
