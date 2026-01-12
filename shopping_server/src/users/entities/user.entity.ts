@@ -11,15 +11,15 @@ export class User {
     @PrimaryGeneratedColumn()
     userId: number;
 
-    @Column({unique:true})
-    username: string;
+    @Column({unique:true, nullable: true})
+    username: string
 
     @Column({unique: true})
     @IsEmail()
     email: string;
 
 
-    @Column()
+    @Column({ nullable: true })
     @Min(8)
     @Exclude()
     password: string;
@@ -28,8 +28,23 @@ export class User {
     @CreateDateColumn()
     createdAt: Date;
 
-    @Column()
+    @Column({default: 'user'})
     role: UserRole;
+
+    @Column({ nullable: true })
+    firstName: string;
+
+    @Column({ nullable: true })
+    lastName: string;
+    
+    @Column({ nullable: true })
+    googleId: string;
+
+    @Column({ default: 'local' }) // 'local' למשתמש רגיל, 'google' למשתמש גוגל
+    provider: string;
+
+    @Column({ nullable: true })
+    picture: string;
 
     @OneToOne(() => Cart, cart => cart.user)
     cart: Cart;

@@ -30,11 +30,37 @@ export class UsersService {
     });
 
     const  savedUser= await this.usersRepository.save(user);
-    await this.cartsService.create({},savedUser.userId);
+    await this.cartsService.create({},savedUser.userId);//יצירת עגלה ריקה למשתמש החדש
     return savedUser;
+}
 
-  
+  async findOrCreateOAuthUser(
+    email: string,
+    provider:string,
+    profile:any,
+  ):Promise<User> {
+    let user = await this.usersRepository.findOne({ where: { email } });
+    if (user) {
+      if(provider === 'google' && !user.googleId) {
+        user.googleId = profile.id;
+        return await this.usersRepository.save(user);
+      }
+      return user;
+    } 
+    user = this.usersRepository.create({
+      email,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      picture: profile.picture,
+      provider,
+      googleId: provider === 'google' ? profile.id : null,
+    });
+    const savedUser = await this.usersRepository.save(user);
+    await this.cartsService.create({}, savedUser.userId); // יצירת עגלה ריקה למשתמש החדש
+    return savedUser;
   }
+  
+
 
   findAll() {
     return this.usersRepository.find();

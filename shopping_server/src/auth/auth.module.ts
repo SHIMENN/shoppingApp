@@ -8,6 +8,7 @@ import { UsersModule } from '../users/users.module';
 import { LocalAuthStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import {AdminGuard} from './guards/admin.guard';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
     imports: [
@@ -16,7 +17,7 @@ import {AdminGuard} from './guards/admin.guard';
       JwtModule.registerAsync({
         imports: [ConfigModule],
         useFactory: async (configService: ConfigService) => ({
-          secret: configService.get<string>('JWT_SECRET'),
+          secret: configService.getOrThrow<string>('JWT_SECRET'),
           signOptions: {
             expiresIn:'24h',
           },
@@ -25,7 +26,11 @@ import {AdminGuard} from './guards/admin.guard';
       }),
     ],
     controllers: [AuthController],
-    providers: [AuthService,JwtStrategy, LocalAuthStrategy,AdminGuard],
+    providers: [AuthService,
+      JwtStrategy, 
+      GoogleStrategy,
+      LocalAuthStrategy,
+      AdminGuard],
     exports: [AuthService],
 })
 export class AuthModule {}

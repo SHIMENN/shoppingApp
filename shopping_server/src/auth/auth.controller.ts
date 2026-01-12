@@ -4,10 +4,13 @@ import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { UsersService } from 'src/users/users.service';
+
 
 @Controller('auth')
 export class AuthController  {
-    constructor (private authService:AuthService){} 
+    constructor (private authService:AuthService , private userService: UsersService){} 
 
 
 
@@ -22,9 +25,11 @@ async register(@Body()registerDto: RegisterDto){
 @Post('login')
 @HttpCode(HttpStatus.OK)
 async login (@Body () logindto:LoginDto,@Request() req){
+
     return this.authService.login(req.user);
 }
 
+// Login - םע Cookie
 @UseGuards(LocalAuthGuard)
 @Post('login-cookie')
 @HttpCode(HttpStatus.OK)
@@ -38,7 +43,7 @@ async loginWithCookie(
         httpOnly: true,
         secure: process.env.NODE_ENV ===  'production',
         sameSite: 'strict',
-        maxAge: 1000 * 60 * 60, // 1 hour
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
     });
     return{user};
 }
@@ -55,4 +60,20 @@ async loginWithCookie(
     response.clearCookie('access_token');
     return { message: 'Logged out successfully' };
   }
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuth(@Request() req) {
+  }
+
+    @Get('google/callback')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@Request() req, @Res() res: Response) {
+        const  {access_token, user} = await this.authService.validateOAuthLogin(
+            req.user.email,
+            'google',
+            req.user,
+        );
+
+        res.redirect(`http://localhost:3000/oauth-success?access_token=${access_token}`);
+    }
 }

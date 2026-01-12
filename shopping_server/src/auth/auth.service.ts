@@ -1,9 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Provider,  } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/auth.dto'; 
 import { UserRole } from 'src/users/enums/roles.enum';
+import { string } from 'zod';
+import { profile } from 'console';
 
 
 @Injectable()
@@ -42,7 +44,7 @@ export class AuthService {
     }
 }
 //שלב ההרשמה עם המטודה פלוס  שימוש ב   dto
-async register(registerDto:RegisterDto) {
+async  register(registerDto:RegisterDto) {
     const userToCreate = {
         ...registerDto,
         role: UserRole.USER, //תפקיד ברירת מחדל
@@ -52,4 +54,15 @@ async register(registerDto:RegisterDto) {
     const { password: _, ...result } = user;
     return this.login(result);
   }
-}
+  async validateOAuthLogin(
+    email: string,
+    provider:string,
+    profile:string,
+  ){
+    const user = await this.usersService.findOrCreateOAuthUser(
+        email,
+         provider,
+          profile
+        );
+    return this.login(user);
+  }}
