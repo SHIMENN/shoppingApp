@@ -4,8 +4,6 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/auth.dto'; 
 import { UserRole } from 'src/users/enums/roles.enum';
-import { string } from 'zod';
-import { profile } from 'console';
 
 
 @Injectable()

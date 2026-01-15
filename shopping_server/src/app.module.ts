@@ -16,7 +16,7 @@ import { Order } from './orders/entities/order.entity';
 import { Cart } from './carts/entities/cart.entity';
 import { CartItem } from './cart-item/entities/cart-item.entity';
 import { OrderItem } from './order-item/entities/order-item.entity';
-
+import { CloudinaryModule } from './products/cloudinary/cloudinary.module';  
 
 @Module({
   imports: [
@@ -42,7 +42,16 @@ import { OrderItem } from './order-item/entities/order-item.entity';
       }),
     }),
 
-     UsersModule, ProductsModule, CartsModule, OrdersModule, OrderItemModule, CartItemModule, AuthModule],
+     UsersModule,
+      ProductsModule, 
+      CartsModule, 
+      OrdersModule, 
+      OrderItemModule,
+       CartItemModule, 
+       AuthModule, 
+       CloudinaryModule],
+
+       
   controllers: [AppController],
   providers: [AppService],
 })

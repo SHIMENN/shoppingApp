@@ -65,7 +65,7 @@ async loginWithCookie(
   async googleAuth(@Request() req) {
   }
 
-    @Get('google/callback')
+ @Get('google/callback')
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Request() req, @Res() res: Response) {
         const  {access_token, user} = await this.authService.validateOAuthLogin(
@@ -73,7 +73,7 @@ async loginWithCookie(
             'google',
             req.user,
         );
-
-        res.redirect(`http://localhost:3000/oauth-success?access_token=${access_token}`);
+        res.cookie('access_token', access_token, { httpOnly: true });
+        res.redirect(`http://localhost:3000/products`);
     }
 }

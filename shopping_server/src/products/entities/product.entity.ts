@@ -19,6 +19,9 @@ export class Product {
     @Column('int')
     stock: number;
 
+    @Column()
+    imageUrl: string;
+
     @OneToMany(() => CartItem, cartItem => cartItem.product)
     cartItems: CartItem[];
 
