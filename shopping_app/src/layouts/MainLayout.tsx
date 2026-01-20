@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import { Outlet } from 'react-router-dom';
-import AppNavbar from '../components/Navbar';
+import { Navbar as AppNavbar } from '../components/navigation';
 
 const MainLayout: React.FC = () => {
   return (

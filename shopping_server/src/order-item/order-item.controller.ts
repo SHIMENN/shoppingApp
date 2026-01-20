@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { OrderItemService } from './order-item.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../auth/guards/admin.guard';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 
-@Controller('order-item')
+@Controller('order-items')
+@UseGuards(JwtAuthGuard)
 export class OrderItemController {
   constructor(private readonly orderItemService: OrderItemService) {}
 
   @Post()
+  @UseGuards(AdminGuard)
   async create(@Body() createOrderItemDto: CreateOrderItemDto) {
-    return await this.orderItemService.create(createOrderItemDto);
+    return this.orderItemService.create(createOrderItemDto);
   }
 
-  @Get()
-  async findAll() {
-    return await this.orderItemService.findAll();
+  @Get('order/:orderId')
+  async getOrderItems(@Param('orderId', ParseIntPipe) orderId: number) {
+    return this.orderItemService.getOrderItems(orderId);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.orderItemService.findOne(+id);
+  @Get(':orderItemId')
+  async getOne(@Param('orderItemId', ParseIntPipe) orderItemId: number) {
+    return this.orderItemService.findOne(orderItemId);
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateOrderItemDto: UpdateOrderItemDto) {
-    return await this.orderItemService.update(+id, updateOrderItemDto);
+  @Put(':orderItemId')
+  @UseGuards(AdminGuard)
+  async update(
+    @Param('orderItemId', ParseIntPipe) orderItemId: number,
+    @Body() updateOrderItemDto: UpdateOrderItemDto,
+  ) {
+    return this.orderItemService.update(orderItemId, updateOrderItemDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.orderItemService.remove(+id);
+  @Delete(':orderItemId')
+  @UseGuards(AdminGuard)
+  async remove(@Param('orderItemId', ParseIntPipe) orderItemId: number) {
+    return this.orderItemService.remove(orderItemId);
   }
 }

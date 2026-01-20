@@ -1,22 +1,35 @@
-import { Entity,PrimaryGeneratedColumn,Column,ManyToOne } from 'typeorm';
-import { Order } from 'src/orders/entities/order.entity';
-import { Product } from 'src/products/entities/product.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Order } from '../../orders/entities/order.entity';
+import { Product } from '../../products/entities/product.entity';
 
-@Entity('orderitems')
+@Entity('order_items')
 export class OrderItem {
-    @PrimaryGeneratedColumn()
-    orderItemId: number;
+  @PrimaryGeneratedColumn()
+  order_item_id: number;
 
-    @Column('int')
-    quantity: number;
+  @Column()
+  order_id: number;
 
-    @Column('decimal', { precision: 10, scale: 2 })
-    price: number;
+  @Column()
+  product_id: number;
 
+  @Column('int')
+  quantity: number;
 
-    @ManyToOne(() => Order, order => order.orderItems)
-    order: Order;
+  @Column('decimal', { precision: 10, scale: 2 })
+  price: number;
 
-    @ManyToOne(() => Product, product => product.orderItems)
-    product: Product;
+  @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'order_id', referencedColumnName: 'order_id' })
+  order: Order;
+
+  @ManyToOne(() => Product, (product) => product.orderItems)
+  @JoinColumn({ name: 'product_id', referencedColumnName: 'product_id' })
+  product: Product;
 }

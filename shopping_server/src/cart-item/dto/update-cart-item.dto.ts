@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateCartItemDto } from './create-cart-item.dto';
+import { IsNumber, IsPositive, IsOptional } from 'class-validator';
 
-export class UpdateCartItemDto extends PartialType(CreateCartItemDto) {}
+export class UpdateCartItemDto {
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  quantity?: number;
+}

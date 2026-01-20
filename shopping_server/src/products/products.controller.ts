@@ -36,8 +36,21 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return await this.productsService.update(+id, updateProductDto);
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 2 }),
+          new FileTypeValidator({ fileType: '.png|jpeg|jpg|webp' }),
+        ],
+        fileIsRequired: false, // תמונה אופציונלית בעדכון
+      }),
+    ) file?: Express.Multer.File,
+  ) {
+    return await this.productsService.update(+id, updateProductDto, file);
   }
 
   @Delete(':id')

@@ -1,11 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateCartItemDto } from './dto/create-cart-item.dto';
-import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { CartItem } from './entities/cart-item.entity';
-import { Cart } from '../carts/entities/cart.entity';
-import { Product } from '../products/entities/product.entity';
 
 @Injectable()
 export class CartItemService {
@@ -15,27 +11,72 @@ export class CartItemService {
   ) {}
 
   async findItem(cartId: number, productId: number): Promise<CartItem | null> {
-    return await this.cartItemRepository.findOne({
-      where: { cartCartId: cartId, productId: productId },
+    return this.cartItemRepository.findOne({
+      where: { cart_cart_id: cartId, product_id: productId },
+      relations: ['product'],
     });
   }
 
-  async createOrUpdate(cartId: number, productId: number, quantity: number): Promise<CartItem> {
+  async findItemById(cartItemId: number): Promise<CartItem> {
+    const item = await this.cartItemRepository.findOne({
+      where: { cart_item_id: cartItemId },
+      relations: ['product'],
+    });
+
+    if (!item) {
+      throw new NotFoundException('פריט העגלה לא נמצא');
+    }
+
+    return item;
+  }
+
+  async createOrUpdate(
+    cartId: number,
+    productId: number,
+    quantity: number,
+  ): Promise<CartItem> {
     let item = await this.findItem(cartId, productId);
 
     if (item) {
       item.quantity += quantity;
     } else {
       item = this.cartItemRepository.create({
-        cartCartId: cartId,
-        productId,
+        cart_cart_id: cartId,
+        product_id: productId,
         quantity,
       });
     }
-    return await this.cartItemRepository.save(item);
+    return this.cartItemRepository.save(item);
+  }
+
+  async updateQuantity(
+    cartId: number,
+    productId: number,
+    quantity: number,
+  ): Promise<CartItem | null> {
+    const item = await this.findItem(cartId, productId);
+
+    if (!item) {
+      throw new NotFoundException('פריט העגלה לא נמצא');
+    }
+
+    if (quantity <= 0) {
+      await this.cartItemRepository.remove(item);
+      return null;
+    }
+
+    item.quantity = quantity;
+    return this.cartItemRepository.save(item);
   }
 
   async removeItem(cartId: number, productId: number): Promise<void> {
-    await this.cartItemRepository.delete({ cartCartId: cartId, productId });
+    await this.cartItemRepository.delete({
+      cart_cart_id: cartId,
+      product_id: productId,
+    });
+  }
+
+  async clearCart(cartId: number): Promise<void> {
+    await this.cartItemRepository.delete({ cart_cart_id: cartId });
   }
 }

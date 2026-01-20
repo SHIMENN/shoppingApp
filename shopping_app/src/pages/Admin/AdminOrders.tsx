@@ -1,11 +1,14 @@
-// src/pages/Admin/AdminOrders.tsx
 import React, { useEffect, useState } from 'react';
-import { Container, Table, Form, Badge, Spinner } from 'react-bootstrap';
+import { Container, Table, Form, Badge, Spinner, Card } from 'react-bootstrap';
 import { getAllOrdersForAdmin, updateOrderStatus } from '../../services/orderAdminService';
+import { type Order } from '../../types/order';
+import { useToast } from '../../hooks/useToast';
+import ToastNotification from '../../components/common/ToastNotification';
 
 const AdminOrders: React.FC = () => {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toasts, showToast, removeToast } = useToast();
 
   useEffect(() => {
     loadOrders();
@@ -13,8 +16,11 @@ const AdminOrders: React.FC = () => {
 
   const loadOrders = async () => {
     try {
+      setLoading(true);
       const data = await getAllOrdersForAdmin();
       setOrders(data);
+    } catch (error) {
+      showToast('שגיאה בטעינת הזמנות', 'danger');
     } finally {
       setLoading(false);
     }
@@ -23,56 +29,69 @@ const AdminOrders: React.FC = () => {
   const handleStatusChange = async (orderId: number, newStatus: string) => {
     try {
       await updateOrderStatus(orderId, newStatus);
-      loadOrders(); // רענון הרשימה לאחר העדכון [cite: 49]
+      showToast(`סטטוס הזמנה #${orderId} עודכן בהצלחה`, 'success');
+      loadOrders(); // רענון הרשימה
     } catch (error) {
-      alert('שגיאה בעדכון הסטטוס');
+      showToast('שגיאה בעדכון הסטטוס', 'danger');
     }
   };
 
   if (loading) return <Spinner animation="border" className="d-block mx-auto mt-5" />;
 
   return (
-    <Container className="mt-4 text-end">
-      <h2 className="mb-4">ניטור הזמנות מערכת</h2>
-      <Table striped bordered hover responsive>
-        <thead className="table-dark">
-          <tr>
-            <th># מזהה</th>
-            <th>לקוח</th>
-            <th>תאריך</th>
-            <th>סה"כ</th>
-            <th>סטטוס</th>
-            <th>עדכון סטטוס</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.order_id}>
-              <td>{order.order_id}</td>
-              <td>{order.user?.username}</td>
-              <td>{new Date(order.order_date).toLocaleDateString()}</td>
-              <td>₪{order.total_amount}</td>
-              <td>
-                <Badge bg={order.status === 'delivered' ? 'success' : 'warning'}>
-                  {order.status}
-                </Badge>
-              </td>
-              <td>
-                <Form.Select 
-                  size="sm" 
-                  value={order.status}
-                  onChange={(e) => handleStatusChange(order.order_id, e.target.value)}
-                >
-                  <option value="pending">בהמתנה</option>
-                  <option value="shipped">נשלח</option>
-                  <option value="delivered">נמסר</option>
-                  <option value="cancelled">בוטל</option>
-                </Form.Select>
-              </td>
+    <Container className="mt-4 text-end" dir="rtl">
+      <ToastNotification toasts={toasts} onClose={removeToast} />
+      <h2 className="mb-4 fw-bold">ניהול הזמנות מערכת 🛒</h2>
+      
+      <Card className="shadow-sm">
+        <Table striped bordered hover responsive className="mb-0">
+          <thead className="table-dark">
+            <tr>
+              <th>מזהה</th>
+              <th>לקוח</th>
+              <th>תאריך</th>
+              <th>סה"כ</th>
+              <th>סטטוס נוכחי</th>
+              <th>פעולת עדכון</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.order_id}>
+                <td>#{order.order_id}</td>
+                <td>
+                  <strong>{order.user?.user_name || 'לקוח'}</strong><br/>
+                  <small className="text-muted">{order.user?.email}</small>
+                </td>
+                <td>{new Date(order.order_date).toLocaleDateString('he-IL')}</td>
+                <td className="fw-bold text-success">₪{order.total_amount}</td>
+                <td>
+                  <Badge bg={
+                    order.status === 'delivered' ? 'success' : 
+                    order.status === 'pending' ? 'warning' : 'info'
+                  }>
+                    {order.status === 'pending' ? 'בהמתנה' : 
+                     order.status === 'shipped' ? 'נשלח' : 
+                     order.status === 'delivered' ? 'נמסר' : 'בוטל'}
+                  </Badge>
+                </td>
+                <td>
+                  <Form.Select 
+                    size="sm" 
+                    value={order.status}
+                    onChange={(e) => handleStatusChange(order.order_id, e.target.value)}
+                  >
+                    <option value="pending">בהמתנה</option>
+                    <option value="shipped">נשלח</option>
+                    <option value="delivered">נמסר</option>
+                    <option value="cancelled">בוטל</option>
+                  </Form.Select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Card>
     </Container>
   );
 };

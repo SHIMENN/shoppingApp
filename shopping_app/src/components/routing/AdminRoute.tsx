@@ -1,7 +1,7 @@
 // רכיב המגן על נתיבי אדמין
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import  {useAuthStore}  from '../store/useAuthStore'; // ייבוא הסטור של זוסטנד
+import  {useAuthStore}  from '../../store/useAuthStore'; // ייבוא הסטור של זוסטנד
 
 const AdminRoute: React.FC = () => {
   // שליפת הנתונים מה-Store

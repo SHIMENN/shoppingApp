@@ -1,41 +1,101 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  UseGuards,
+  Req,
+  Query,
+  ParseIntPipe,
+  Param,
+  Body,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../auth/guards/admin.guard';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order.dto';
+import type { RequestWithUser } from '../common/interfaces/request.interface';
 
 @Controller('orders')
+@UseGuards(JwtAuthGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Post()
-  async create(@Body() createOrderDto: CreateOrderDto) {
-    return await this.ordersService.create(createOrderDto);
+  @Post('checkout')
+  async checkout(
+    @Req() req: RequestWithUser,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    const userId = req.user.id;
+    return this.ordersService.createOrderFromCart(userId, createOrderDto);
   }
 
-  @Post('from-cart')
-  @UseGuards(JwtAuthGuard)
-  async createFromCart(@Request() req) {
-    return await this.ordersService.createOrder(req.user.userId);
+  @Get('my-orders')
+  async getMyOrders(
+    @Req() req: RequestWithUser,
+    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+  ) {
+    const userId = req.user.id;
+    return this.ordersService.getUserOrders(userId, {
+      page: Math.max(1, page),
+      limit: Math.min(100, Math.max(1, limit)),
+    });
   }
 
-  @Get()
-  async findAll() {
-    return await this.ordersService.findAll();
+  @Get(':orderId')
+  async getOrderById(
+    @Req() req: RequestWithUser,
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ) {
+    const userId = req.user.id;
+    return this.ordersService.getOrderById(userId, orderId);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.ordersService.findOne(+id);
+  @Patch(':orderId/cancel')
+  async cancelOrder(
+    @Req() req: RequestWithUser,
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ) {
+    const userId = req.user.id;
+    return this.ordersService.cancelOrder(userId, orderId);
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return await this.ordersService.update(+id, updateOrderDto);
+  // Admin routes
+  @Get('admin/all')
+  @UseGuards(AdminGuard)
+  async getAllOrders(
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+  ) {
+    if (page && limit) {
+      return this.ordersService.getAllOrdersForAdmin({
+        page: Math.max(1, page),
+        limit: Math.min(100, Math.max(1, limit)),
+      });
+    }
+    return this.ordersService.getAllOrdersForAdmin();
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.ordersService.remove(+id);
+  @Get('admin/stats')
+  @UseGuards(AdminGuard)
+  async getOrderStats() {
+    return this.ordersService.getOrderStats();
+  }
+
+  @Get('admin/:orderId')
+  @UseGuards(AdminGuard)
+  async getOrderByIdForAdmin(@Param('orderId', ParseIntPipe) orderId: number) {
+    return this.ordersService.getOrderByIdForAdmin(orderId);
+  }
+
+  @Patch('admin/:orderId/status')
+  @UseGuards(AdminGuard)
+  async updateOrderStatus(
+    @Param('orderId', ParseIntPipe) orderId: number,
+    @Body() updateStatusDto: UpdateOrderStatusDto,
+  ) {
+    return this.ordersService.updateOrderStatus(orderId, updateStatusDto);
   }
 }

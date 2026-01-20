@@ -5,7 +5,7 @@ import { Entity,PrimaryGeneratedColumn,Column,OneToMany} from 'typeorm';
 @Entity('products')
 export class Product {
     @PrimaryGeneratedColumn()
-    productId: number;
+    product_id: number;
 
     @Column()
     name: string;
@@ -13,19 +13,23 @@ export class Product {
     @Column('text')
     description: string;
 
-    @Column('decimal', { precision: 10, scale: 2 })
+    @Column('decimal', {  precision: 10, scale: 2 })
     price: number;
 
     @Column('int')
     stock: number;
 
     @Column()
-    imageUrl: string;
+    image_url: string;
 
     @OneToMany(() => CartItem, cartItem => cartItem.product)
     cartItems: CartItem[];
 
     @OneToMany(() => OrderItem, orderItem => orderItem.product)
     orderItems: OrderItem[];
+
+    // get id(): number {
+    //     return this.product_id;
+    // }
 
 }

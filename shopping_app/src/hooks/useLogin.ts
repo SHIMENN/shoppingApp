@@ -19,8 +19,8 @@ export const useLogin = () => {
     setLoading(true);
     
     try {
-      const { token, user } = await loginApi(email, password);
-      setAuthData(user, token);
+      const { access_token, user } = await loginApi(email, password);
+      setAuthData(user, access_token);
       navigate('/');
     } catch (err) {
       setError('פרטי התחברות שגויים. נסה שוב.');

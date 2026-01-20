@@ -1,16 +1,11 @@
-import { IsNotEmpty, IsNumber, IsPositive, IsString, IsOptional } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateOrderDto {
-    @IsNotEmpty()
-    @IsNumber()
-    userId: number;
+  @IsOptional()
+  @IsString()
+  shipping_address?: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    @IsPositive()
-    totalAmount: number;
-
-    @IsOptional()
-    @IsString()
-    status?: string;
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

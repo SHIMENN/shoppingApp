@@ -1,16 +1,22 @@
 
 export interface User {
-  username: string; // [cite: 74, 75]
-  email: string; // [cite: 77, 78]
-  isAdmin: boolean; // [cite: 82]
-  role: 'user' | 'admin'; // [cite: 85]
+  user_id: number;
+  user_name: string;
+  email: string;
+  role: 'user' | 'admin';
+  first_name?: string;
+  last_name?: string;
+  created_at?: Date;
+  google_id?: string;
+  provider?: string;
+  picture?: string;
 }
 export interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   setAuthData: (userData: User, token: string) => void;
-  login: (userData: User, token: string) => void; // חובה להוסיף את זה כאן!
+  login: (userData: User, token: string) => void; 
   logout: () => void;
 }
 export interface AuthState {

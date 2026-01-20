@@ -3,7 +3,7 @@ import { Button, Image } from 'react-bootstrap';
 import { useCartStore } from '../../store/useCartStore';
 
 interface CartItemProps {
-  item: any; // מומלץ להחליף ב-Type ה-Product שלך
+  item: any; // מומלץ להשתמש ב-Type Product מהקובץ types/product.ts
 }
 
 const CartItem: React.FC<CartItemProps> = ({ item }) => {
@@ -13,8 +13,9 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
     <tr>
       <td>
         <div className="d-flex align-items-center">
+          {/* תיקון 1: שינוי מ-imageUrl ל-image_url כדי להתאים ל-Entity בשרת */}
           <Image 
-            src={item.product.imageUrl || 'https://via.placeholder.com/50'} 
+            src={item.product.image_url || 'https://via.placeholder.com/50'} 
             rounded 
             style={{ width: '60px', height: '60px', objectFit: 'cover', marginLeft: '15px' }} 
           />
@@ -27,7 +28,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
           <Button 
             variant="outline-secondary" 
             size="sm" 
-            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+            onClick={() => updateQuantity(item.product.product_id, item.quantity - 1)}
           >
              -
           </Button>
@@ -35,7 +36,8 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
           <Button 
             variant="outline-secondary" 
             size="sm" 
-            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+        
+            onClick={() => updateQuantity(item.product.product_id, item.quantity + 1)}
           >
              +
           </Button>
@@ -46,7 +48,8 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
         <Button 
           variant="link" 
           className="text-danger p-0 text-decoration-none" 
-          onClick={() => removeFromCart(item.product.id)}
+    
+          onClick={() => removeFromCart(item.product.product_id)}
         >
           הסר
         </Button>

@@ -30,7 +30,7 @@ export class UsersService {
     });
 
     const  savedUser= await this.usersRepository.save(user);
-    await this.cartsService.create(savedUser.userId);//יצירת עגלה ריקה למשתמש החדש
+    await this.cartsService.create(savedUser.user_id);//יצירת עגלה ריקה למשתמש החדש
     return savedUser;
 }
 
@@ -41,22 +41,22 @@ export class UsersService {
   ):Promise<User> {
     let user = await this.usersRepository.findOne({ where: { email } });
     if (user) {
-      if(provider === 'google' && !user.googleId) {
-        user.googleId = profile.id;
+      if(provider === 'google' && !user.google_id) {
+        user.google_id = profile.id;
         return await this.usersRepository.save(user);
       }
       return user;
     } 
     user = this.usersRepository.create({
       email,
-      firstName: profile.firstName,
-      lastName: profile.lastName,
+      first_name: profile.firstName,
+      last_name: profile.lastName,
       picture: profile.picture,
       provider,
-      googleId: provider === 'google' ? profile.id : null,
+      google_id: provider === 'google' ? profile.id : null,
     });
     const savedUser = await this.usersRepository.save(user);
-    await this.cartsService.create(savedUser.userId); // יצירת עגלה ריקה למשתמש החדש  גוגל
+    await this.cartsService.create(savedUser.user_id); // יצירת עגלה ריקה למשתמש החדש  גוגל
     return savedUser;
   }
   
@@ -67,7 +67,7 @@ export class UsersService {
   }
 
  async findById(userId: number): Promise<User | null> {
-    return await this.usersRepository.findOne({ where: { userId } });
+    return await this.usersRepository.findOne({ where: { user_id: userId } });
   }
   async findByEmail(email: string): Promise<User | null> {
     return await this.usersRepository.findOne({ where: {email}});
@@ -79,6 +79,6 @@ async update(userId: number, updateUserDto: UpdateUserDto) {
 }
 
   async remove(id: number) {
-    await this.usersRepository.delete({userId: id});
+    await this.usersRepository.delete({user_id: id});
   }
 }

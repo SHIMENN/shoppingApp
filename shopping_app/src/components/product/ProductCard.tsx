@@ -1,7 +1,7 @@
 // סרגל רכיב כרטיס מוצר המציג מידע בסיסי על המוצר
 import React from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
-import { type Product } from '../types/product';
+import { type Product } from '../../types/product';
 
 interface ProductCardProps {
   product: Product;
@@ -12,10 +12,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   return (
     <Card className="h-100 shadow-sm">
       {/* תמונה המגיעה מפתרון אחסון חיצוני כמו Cloudinary */}
-      <Card.Img 
-        variant="top" 
-        src={product.imageUrl || 'https://via.placeholder.com/150'} 
-        style={{ height: '200px', objectFit: 'cover' }} 
+      <Card.Img
+        variant="top"
+        src={product.image_url || 'https://via.placeholder.com/150'}
+        style={{ height: '200px', objectFit: 'cover' }}
       />
       <Card.Body className="d-flex flex-column">
         <Card.Title>{product.name}</Card.Title>

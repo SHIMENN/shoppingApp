@@ -1,82 +1,230 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
-import { Order } from './entities/order.entity';
-import { OrderItemService } from '../order-item/order-item.service';
+import { Repository, DataSource } from 'typeorm';
+import { Order, OrderStatus } from './entities/order.entity';
+import { OrderItem } from '../order-item/entities/order-item.entity';
 import { CartsService } from '../carts/carts.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order.dto';
+
+export interface PaginatedOrders {
+  orders: Order[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export interface PaginationOptions {
+  page: number;
+  limit: number;
+}
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
-    private readonly orderItemService: OrderItemService,
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepository: Repository<OrderItem>,
     private readonly cartsService: CartsService,
+    private readonly dataSource: DataSource,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const order = this.orderRepository.create(createOrderDto);
-    return await this.orderRepository.save(order);
+  async createOrderFromCart(
+    userId: number,
+    createOrderDto?: CreateOrderDto,
+  ): Promise<Order> {
+    const cart = await this.cartsService.getCartForOrder(userId);
+
+    if (!cart.cartItems || cart.cartItems.length === 0) {
+      throw new BadRequestException('העגלה ריקה, לא ניתן לבצע הזמנה');
+    }
+
+    const totalAmount = cart.cartItems.reduce(
+      (sum: number, item: any) =>
+        sum + Number(item.product.price) * item.quantity,
+      0,
+    );
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const order = this.orderRepository.create({
+        user_id: userId,
+        total_amount: totalAmount,
+        status: OrderStatus.PENDING,
+        shipping_address: createOrderDto?.shipping_address,
+        notes: createOrderDto?.notes,
+      });
+
+      const savedOrder = await queryRunner.manager.save(order);
+
+      const orderItems = cart.cartItems.map((item: any) =>
+        this.orderItemRepository.create({
+          order_id: savedOrder.order_id,
+          product_id: item.product.product_id,
+          quantity: item.quantity,
+          price: item.product.price,
+        }),
+      );
+
+      await queryRunner.manager.save(orderItems);
+      await this.cartsService.clearCart(userId);
+      await queryRunner.commitTransaction();
+
+      const finalOrder = await this.orderRepository.findOne({
+        where: { order_id: savedOrder.order_id },
+        relations: ['items', 'items.product', 'user'],
+      });
+
+      if (!finalOrder) {
+        throw new NotFoundException('שגיאה ביצירת ההזמנה');
+      }
+
+      return finalOrder;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  async findAll(): Promise<Order[]> {
-    return await this.orderRepository.find({
-      relations: ['user', 'orderItems'],
+  async getUserOrders(
+    userId: number,
+    options: PaginationOptions,
+  ): Promise<PaginatedOrders> {
+    const skip = (options.page - 1) * options.limit;
+
+    const [orders, total] = await this.orderRepository.findAndCount({
+      where: { user_id: userId },
+      relations: ['items', 'items.product'],
+      order: { order_date: 'DESC' },
+      skip,
+      take: options.limit,
     });
+
+    return {
+      orders,
+      total,
+      page: options.page,
+      totalPages: Math.ceil(total / options.limit),
+    };
   }
 
-  async findOne(id: number): Promise<Order> {
+  async getOrderById(userId: number, orderId: number): Promise<Order> {
     const order = await this.orderRepository.findOne({
-      where: { orderId: id },
-      relations: ['user', 'orderItems'],
+      where: { order_id: orderId, user_id: userId },
+      relations: ['items', 'items.product'],
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
+      throw new NotFoundException('ההזמנה לא נמצאה');
     }
 
     return order;
   }
 
-  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<Order> {
-    const order = await this.findOne(id);
-    Object.assign(order, updateOrderDto);
-    return await this.orderRepository.save(order);
+  async cancelOrder(userId: number, orderId: number): Promise<Order> {
+    const order = await this.getOrderById(userId, orderId);
+
+    if (order.status !== OrderStatus.PENDING) {
+      throw new BadRequestException('לא ניתן לבטל הזמנה שכבר עברה עיבוד');
+    }
+
+    order.status = OrderStatus.CANCELLED;
+    return this.orderRepository.save(order);
   }
 
- async createOrder(userId: number) {
-  // 1. קבלת כל נתוני העגלה והפריטים
-  const cart = await this.cartsService.getCartForOrder(userId);
+  // Admin methods
+  async getAllOrdersForAdmin(
+    options?: PaginationOptions,
+  ): Promise<PaginatedOrders | Order[]> {
+    if (options) {
+      const skip = (options.page - 1) * options.limit;
 
-  // 2. חישוב סכום כולל להזמנה
-  const totalPrice = cart.cartItems.reduce((sum, item) => {
-    return sum + (item.quantity * item.product.price);
-  }, 0);
+      const [orders, total] = await this.orderRepository.findAndCount({
+        relations: ['items', 'items.product', 'user'],
+        order: { order_date: 'DESC' },
+        skip,
+        take: options.limit,
+      });
 
-  // 3. יצירת ההזמנה (כאן אתה שומר בטבלת Orders)
-  const newOrder = this.orderRepository.create({
-    userId,
-    totalAmount: totalPrice,
-    // מיפוי פריטי העגלה לפריטי הזמנה
-    orderItems: cart.cartItems.map(item => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      priceAtPurchase: item.product.price // חשוב: שומרים את המחיר ברגע הקנייה
-    }))
-  });
+      return {
+        orders,
+        total,
+        page: options.page,
+        totalPages: Math.ceil(total / options.limit),
+      };
+    }
 
-  const savedOrder = await this.orderRepository.save(newOrder);
+    return this.orderRepository.find({
+      relations: ['items', 'items.product', 'user'],
+      order: { order_date: 'DESC' },
+    });
+  }
 
-  // 4. חשוב מאוד: ריקון העגלה לאחר שההזמנה הצליחה
-  await this.cartsService.clearCart(userId);
+  async getOrderByIdForAdmin(orderId: number): Promise<Order> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: orderId },
+      relations: ['items', 'items.product', 'user'],
+    });
 
-  return savedOrder;
-}
+    if (!order) {
+      throw new NotFoundException('ההזמנה לא נמצאה');
+    }
 
-  async remove(id: number): Promise<void> {
-    const order = await this.findOne(id);
-    await this.orderRepository.remove(order);
+    return order;
+  }
+
+  async updateOrderStatus(
+    orderId: number,
+    updateStatusDto: UpdateOrderStatusDto,
+  ): Promise<Order> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: orderId },
+      relations: ['items', 'items.product', 'user'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('ההזמנה לא נמצאה');
+    }
+
+    order.status = updateStatusDto.status;
+    return this.orderRepository.save(order);
+  }
+
+  async getOrderStats(): Promise<{
+    totalOrders: number;
+    totalRevenue: number;
+    ordersByStatus: Record<string, number>;
+  }> {
+    const orders = await this.orderRepository.find();
+
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce(
+      (sum, order) => sum + Number(order.total_amount),
+      0,
+    );
+
+    const ordersByStatus = orders.reduce(
+      (acc, order) => {
+        acc[order.status] = (acc[order.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    return {
+      totalOrders,
+      totalRevenue,
+      ordersByStatus,
+    };
   }
 }

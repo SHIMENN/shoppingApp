@@ -1,28 +1,32 @@
-import { Entity,PrimaryGeneratedColumn,Column,ManyToOne,JoinColumn} from 'typeorm';
-import { Cart } from 'src/carts/entities/cart.entity';
-import { Product } from 'src/products/entities/product.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Cart } from '../../carts/entities/cart.entity';
+import { Product } from '../../products/entities/product.entity';
 
-@Entity('cart items')
+@Entity('cart_items')
 export class CartItem {
-    @PrimaryGeneratedColumn()
-    cartItemId: number;
+  @PrimaryGeneratedColumn()
+  cart_item_id: number;
 
-    @Column()
-    quantity: number;
+  @Column({ name: 'quantity' })
+  quantity: number;
 
-    @Column()
-    cartCartId: number;
+  @Column({ name: 'cart_cart_id' })
+  cart_cart_id: number;
 
-    @Column()
-    productId: number;
+  @Column({ name: 'product_id' })
+  product_id: number;
 
-    @ManyToOne(() => Cart, cart => cart.cartItems)
-    @JoinColumn({ name: 'cartCartId' }) // השם כאן חייב להתאים ל-Column למעלה
-    cart: Cart;
+  @ManyToOne(() => Cart, (cart) => cart.cartItems, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'cart_cart_id' })
+  cart: Cart;
 
-    @ManyToOne(() => Product, product => product.cartItems)
-    @JoinColumn({ name: 'productId' })
-    product: Product;
-
-
+  @ManyToOne(() => Product, (product) => product.cartItems)
+  @JoinColumn({ name: 'product_id' })
+  product: Product;
 }

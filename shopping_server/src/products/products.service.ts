@@ -18,19 +18,25 @@ export class ProductsService {
     const result =await this.cloudinaryServise.uploadImage(file);
     return await this.productRepository.save({
       ...createProductDto,
-    imageUrl: result.secure_url,
+      image_url: result.secure_url,
     });
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.productRepository.find({
+  async findAll(): Promise<any[]> {
+    const products = await this.productRepository.find({
       relations: ['cartItems', 'orderItems'],
     });
+
+    // Add 'id' field for client compatibility
+    return products.map(product => ({
+      ...product,
+      id: product.product_id,
+    }));
   }
 
-  async findOne(id: number): Promise<Product> {
+  async findOne(id: number): Promise<any> {
     const product = await this.productRepository.findOne({
-      where: { productId: id },
+      where: { product_id: id },
       relations: ['cartItems', 'orderItems'],
     });
 
@@ -38,13 +44,36 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    return product;
+    // Add 'id' field for client compatibility
+    return {
+      ...product,
+      id: product.product_id,
+    };
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
-    const product = await this.findOne(id);
+  async update(id: number, updateProductDto: UpdateProductDto, file?: Express.Multer.File): Promise<any> {
+    const product = await this.productRepository.findOne({
+      where: { product_id: id },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    // אם הועלתה תמונה חדשה, נעלה אותה ל-Cloudinary
+    if (file) {
+      const result = await this.cloudinaryServise.uploadImage(file);
+      updateProductDto.image_url = result.secure_url;
+    }
+
     Object.assign(product, updateProductDto);
-    return await this.productRepository.save(product);
+    const updatedProduct = await this.productRepository.save(product);
+
+    // Add 'id' field for client compatibility
+    return {
+      ...updatedProduct,
+      id: updatedProduct.product_id,
+    };
   }
 
   async remove(id: number): Promise<void> {

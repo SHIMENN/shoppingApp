@@ -1,8 +1,8 @@
 import React from 'react';
 import { Navbar, Nav, Container, Button, Badge } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/useAuthStore';
-import { useCartStore } from '../store/useCartStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { useCartStore } from '../../store/useCartStore';
 
 const AppNavbar: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +35,9 @@ const AppNavbar: React.FC = () => {
 
             {/* בדיקת הרשאת אדמין מהסטור */}
             {user?.role === 'admin' && (
-              <Nav.Link as={Link} to="/admin" className="text-warning">ניהול</Nav.Link>
+              <Nav.Link as={Link} to="/admin" className="text-warning fw-bold">
+                🛠️ פאנל ניהול
+              </Nav.Link>
             )}
           </Nav>
           
@@ -43,7 +45,7 @@ const AppNavbar: React.FC = () => {
             {isAuthenticated ? (
               <>
                 <Navbar.Text className="me-3 text-light">
-                  שלום <strong>{user?.username}</strong>
+                  שלום <strong>{user?.user_name}</strong>
                 </Navbar.Text>
                 <Button 
                   variant="outline-light" 

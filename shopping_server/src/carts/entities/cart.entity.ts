@@ -1,24 +1,30 @@
-import { Entity, PrimaryGeneratedColumn,OneToOne, JoinColumn,CreateDateColumn,OneToMany, Column } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { CartItem } from 'src/cart-item/entities/cart-item.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+  CreateDateColumn,
+  OneToMany,
+  Column,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import { CartItem } from '../../cart-item/entities/cart-item.entity';
 
-@Entity('carts')   
+@Entity('carts')
 export class Cart {
-    @PrimaryGeneratedColumn()
-    cartId: number;
+  @PrimaryGeneratedColumn()
+  cart_id: number;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  created_at: Date;
 
-    // עמודה מספרית פשוטה - בלי insert: false!
-    @Column({ nullable: true })
-    userUserId: number;
+  @Column({ name: 'user_user_id', nullable: true })
+  user_user_id: number;
 
-    // הקשר משתמש בדיוק באותה עמודה (userId)
-    @OneToOne(() => User, user => user.cart)
-    @JoinColumn({ name: 'userUserId' }) 
-    user: User;
+  @OneToOne(() => User, (user) => user.cart)
+  @JoinColumn({ name: 'user_user_id' })
+  user: User;
 
-    @OneToMany(() => CartItem, cartItem => cartItem.cart,{cascade: true,})
-    cartItems: CartItem[];
+  @OneToMany(() => CartItem, (cartItem) => cartItem.cart, { cascade: true })
+  cartItems: CartItem[];
 }
