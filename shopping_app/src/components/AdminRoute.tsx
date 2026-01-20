@@ -1,17 +1,27 @@
 // רכיב המגן על נתיבי אדמין
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import  {useAuthStore}  from '../store/useAuthStore'; // ייבוא הסטור של זוסטנד
 
 const AdminRoute: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+  // שליפת הנתונים מה-Store
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const loading = useAuthStore((state) => state.loading);
 
-  // בדיקה האם המשתמש מחובר והאם הוא אדמין 
-  if (!isAuthenticated || !user?.isAdmin) {
+  // בזמן שהמערכת בודקת אימות (למשל מול עוגיות גוגל), נציג טעינה
+  if (loading) {
+    return <div className="text-center mt-5">בודק הרשאות...</div>;
+  }
+
+  // בדיקה האם המשתמש מחובר והאם התפקיד שלו הוא אדמין
+  // הערה: וודא שב-User Type שלך מוגדר 'role' או 'isAdmin'
+  if (!isAuthenticated || user?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />; // מאפשר גישה לנתיבים הפנימיים
+  // אם הכל תקין, אפשר לגשת לנתיבי האדמין
+  return <Outlet />;
 };
 
 export default AdminRoute;

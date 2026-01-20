@@ -73,7 +73,7 @@ async loginWithCookie(
             'google',
             req.user,
         );
-        res.cookie('access_token', access_token, { httpOnly: true });
-        res.redirect(`http://localhost:3000/products`);
+        res.cookie('access_token', access_token, { httpOnly: true ,path: '/',});
+        res.redirect(`http://localhost:5173`);
     }
 }

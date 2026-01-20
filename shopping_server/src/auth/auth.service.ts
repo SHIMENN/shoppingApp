@@ -44,7 +44,7 @@ export class AuthService {
 //שלב ההרשמה עם המטודה פלוס  שימוש ב   dto
 async  register(registerDto:RegisterDto) {
     const userToCreate = {
-        ...registerDto,
+        ...registerDto, //תפקיד ברירת מחדל
         role: UserRole.USER, //תפקיד ברירת מחדל
     };
     const user = await this.usersService.create(userToCreate);

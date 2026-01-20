@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+export const API_URL = import.meta.env.VITE_API_URL
+
 const api = axios.create({//הגדרת כתובת השרת
-    baseURL:'http://localhost:3000',
+    baseURL:API_URL,
     withCredentials: true,
     headers:{
     'Content-Type': 'application/json'

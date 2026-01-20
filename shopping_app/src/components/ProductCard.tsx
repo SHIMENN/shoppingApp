@@ -1,7 +1,7 @@
 // סרגל רכיב כרטיס מוצר המציג מידע בסיסי על המוצר
 import React from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
-import { type Product } from '../types/index';
+import { type Product } from '../types/product';
 
 interface ProductCardProps {
   product: Product;

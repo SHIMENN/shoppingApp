@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
@@ -12,62 +12,30 @@ export class CartItemService {
   constructor(
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
-    @InjectRepository(Cart)
-    private readonly cartRepository: Repository<Cart>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
   ) {}
 
-  async create(createCartItemDto: CreateCartItemDto): Promise<CartItem> {
-    const cart = await this.cartRepository.findOne({
-      where: { cartId: createCartItemDto.cartId },
+  async findItem(cartId: number, productId: number): Promise<CartItem | null> {
+    return await this.cartItemRepository.findOne({
+      where: { cartCartId: cartId, productId: productId },
     });
-    if (!cart) {
-      throw new NotFoundException(`Cart with ID ${createCartItemDto.cartId} not found`);
+  }
+
+  async createOrUpdate(cartId: number, productId: number, quantity: number): Promise<CartItem> {
+    let item = await this.findItem(cartId, productId);
+
+    if (item) {
+      item.quantity += quantity;
+    } else {
+      item = this.cartItemRepository.create({
+        cartCartId: cartId,
+        productId,
+        quantity,
+      });
     }
-
-    const product = await this.productRepository.findOne({
-      where: { productId: createCartItemDto.productId },
-    });
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${createCartItemDto.productId} not found`);
-    }
-
-    const cartItem = this.cartItemRepository.create({
-      cart,
-      product,
-      quantity: createCartItemDto.quantity,
-    });
-    return await this.cartItemRepository.save(cartItem);
+    return await this.cartItemRepository.save(item);
   }
 
-  async findAll(): Promise<CartItem[]> {
-    return await this.cartItemRepository.find({
-      relations: ['cart', 'product'],
-    });
-  }
-
-  async findOne(id: number): Promise<CartItem> {
-    const cartItem = await this.cartItemRepository.findOne({
-      where: { cartItemId: id },
-      relations: ['cart', 'product'],
-    });
-
-    if (!cartItem) {
-      throw new NotFoundException(`Cart item with ID ${id} not found`);
-    }
-
-    return cartItem;
-  }
-
-  async update(id: number, updateCartItemDto: UpdateCartItemDto): Promise<CartItem> {
-    const cartItem = await this.findOne(id);
-    Object.assign(cartItem, updateCartItemDto);
-    return await this.cartItemRepository.save(cartItem);
-  }
-
-  async remove(id: number): Promise<void> {
-    const cartItem = await this.findOne(id);
-    await this.cartItemRepository.remove(cartItem);
+  async removeItem(cartId: number, productId: number): Promise<void> {
+    await this.cartItemRepository.delete({ cartCartId: cartId, productId });
   }
 }

@@ -30,7 +30,7 @@ export class UsersService {
     });
 
     const  savedUser= await this.usersRepository.save(user);
-    await this.cartsService.create({},savedUser.userId);//יצירת עגלה ריקה למשתמש החדש
+    await this.cartsService.create(savedUser.userId);//יצירת עגלה ריקה למשתמש החדש
     return savedUser;
 }
 
@@ -56,7 +56,7 @@ export class UsersService {
       googleId: provider === 'google' ? profile.id : null,
     });
     const savedUser = await this.usersRepository.save(user);
-    await this.cartsService.create({}, savedUser.userId); // יצירת עגלה ריקה למשתמש החדש
+    await this.cartsService.create(savedUser.userId); // יצירת עגלה ריקה למשתמש החדש  גוגל
     return savedUser;
   }
   

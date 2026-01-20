@@ -46,46 +46,34 @@ export class OrdersService {
     return await this.orderRepository.save(order);
   }
 
-  async createFromCart(userId: number): Promise<Order> {
-    // קבל את העגלה של המשתמש עם הפריטים והמוצרים
-    const carts = await this.cartsService.findAll();
-    const userCart = carts.find(c => c.user && c.user.userId === userId);
+ async createOrder(userId: number) {
+  // 1. קבלת כל נתוני העגלה והפריטים
+  const cart = await this.cartsService.getCartForOrder(userId);
 
-    if (!userCart || !userCart.cartItems || userCart.cartItems.length === 0) {
-      throw new NotFoundException('Cart is empty or not found');
-    }
+  // 2. חישוב סכום כולל להזמנה
+  const totalPrice = cart.cartItems.reduce((sum, item) => {
+    return sum + (item.quantity * item.product.price);
+  }, 0);
 
-    // חשב את הסכום הכולל - קח את המחיר מהמוצר
-    const totalAmount = userCart.cartItems.reduce((sum, item) => {
-      if (!item.product) {
-        throw new NotFoundException(`Product not found for cart item ${item.cartItemId}`);
-      }
-      return sum + (item.product.price * item.quantity);
-    }, 0);
+  // 3. יצירת ההזמנה (כאן אתה שומר בטבלת Orders)
+  const newOrder = this.orderRepository.create({
+    userId,
+    totalAmount: totalPrice,
+    // מיפוי פריטי העגלה לפריטי הזמנה
+    orderItems: cart.cartItems.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      priceAtPurchase: item.product.price // חשוב: שומרים את המחיר ברגע הקנייה
+    }))
+  });
 
-    // צור הזמנה חדשה
-    const order = await this.create({
-      userId,
-      totalAmount,
-      status: 'pending'
-    });
+  const savedOrder = await this.orderRepository.save(newOrder);
 
-    // צור פריטי הזמנה מהפריטים בעגלה
-    for (const cartItem of userCart.cartItems) {
-      if (!cartItem.product) {
-        throw new NotFoundException(`Product not found for cart item ${cartItem.cartItemId}`);
-      }
+  // 4. חשוב מאוד: ריקון העגלה לאחר שההזמנה הצליחה
+  await this.cartsService.clearCart(userId);
 
-      await this.orderItemService.create({
-        orderId: order.orderId,
-        productId: cartItem.product.productId,
-        quantity: cartItem.quantity,
-        price: cartItem.product.price
-      });
-    }
-
-    return order;
-  }
+  return savedOrder;
+}
 
   async remove(id: number): Promise<void> {
     const order = await this.findOne(id);

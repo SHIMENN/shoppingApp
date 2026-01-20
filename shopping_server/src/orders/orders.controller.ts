@@ -16,7 +16,7 @@ export class OrdersController {
   @Post('from-cart')
   @UseGuards(JwtAuthGuard)
   async createFromCart(@Request() req) {
-    return await this.ordersService.createFromCart(req.user.userId);
+    return await this.ordersService.createOrder(req.user.userId);
   }
 
   @Get()

@@ -12,3 +12,7 @@ export const registerApi = async (username: string, email: string, password: str
   const response = await api.post('/auth/register', { username, email, password });
   return response.data;
 };
+export const getMeApi = async () => {
+  const response = await api.get('/auth/profile'); // השרת יקרא את העוגייה ויזהה אותך
+  return response.data; // מחזיר את נתוני המשתמש
+};
