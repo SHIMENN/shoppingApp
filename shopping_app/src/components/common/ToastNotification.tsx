@@ -1,17 +1,6 @@
 import React from 'react';
 import { Toast, ToastContainer } from 'react-bootstrap';
-
-export interface ToastMessage {
-  id: string;
-  message: string;
-  variant: 'success' | 'danger' | 'warning' | 'info';
-  show: boolean;
-}
-
-interface ToastNotificationProps {
-  toasts: ToastMessage[];
-  onClose: (id: string) => void;
-}
+import { type ToastNotificationProps } from '../../types/admin';
 
 const ToastNotification: React.FC<ToastNotificationProps> = ({ toasts, onClose }) => {
   return (

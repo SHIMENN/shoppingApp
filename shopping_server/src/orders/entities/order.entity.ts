@@ -1,23 +1,9 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  OneToMany,
-  CreateDateColumn,
-  JoinColumn,
-} from 'typeorm';
+import {Entity,PrimaryGeneratedColumn,Column,ManyToOne,OneToMany,CreateDateColumn,JoinColumn,} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { OrderItem } from '../../order-item/entities/order-item.entity';
+import { OrderStatus } from '../../orders/enums/order.enum';
 
-export enum OrderStatus {
-  PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  PROCESSING = 'processing',
-  SHIPPED = 'shipped',
-  DELIVERED = 'delivered',
-  CANCELLED = 'cancelled',
-}
+
 
 @Entity('orders')
 export class Order {
@@ -30,11 +16,7 @@ export class Order {
   @Column('decimal', { precision: 10, scale: 2 })
   total_amount: number;
 
-  @Column({
-    type: 'enum',
-    enum: OrderStatus,
-    default: OrderStatus.PENDING,
-  })
+  @Column({type: 'enum',enum: OrderStatus,default: OrderStatus.PENDING,})
   status: OrderStatus;
 
   @Column({ nullable: true })

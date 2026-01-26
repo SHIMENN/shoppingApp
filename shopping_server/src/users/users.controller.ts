@@ -11,9 +11,6 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 @UseGuards(JwtAuthGuard) 
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-
-
   @Post()
   @UseGuards(AdminGuard)
   async create(@Body() createUserDto: CreateUserDto) {

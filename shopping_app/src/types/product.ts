@@ -18,8 +18,6 @@ export interface ProductState {
   loading: boolean;
   error: string | null;
   actionLoading: boolean;
-
-  // פעולות (Actions)
   loadProducts: () => Promise<void>;
   addProduct: (product: FormData) => Promise<void>; // שינוי ל-FormData בגלל התמונות
   updateProduct: (product_id: number, product: FormData) => Promise<void>;

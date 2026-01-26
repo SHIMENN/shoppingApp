@@ -1,3 +1,6 @@
+/**
+ * טיפוסים עבור משתמשים - פרטי משתמש, הרשאות, ומצב אותנטיקציה
+ */
 
 export interface User {
   user_id: number;
@@ -26,5 +29,6 @@ export interface AuthState {
   loading: boolean;
   setAuthData: (user: User, token: string) => void;
   logout: () => void;
+  updateUser: (data: Partial<User>) => Promise<void>;
   checkAuth: () => Promise<void>;
 }

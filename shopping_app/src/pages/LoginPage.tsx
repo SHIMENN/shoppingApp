@@ -56,7 +56,7 @@ const LoginPage: React.FC = () => {
         <SocialButtons onGoogleLogin={handleGoogleLogin} />
 
         <div className="text-center mt-4">
-          אין לך חשבון? <Link to="/register" className="text-decoration-none">הרשם כאן</Link>
+          אין לך חשבון? <Link to="/register" className="text-decoration-none">הרשמה</Link>
         </div>
       </Card>
     </Container>

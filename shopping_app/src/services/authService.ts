@@ -32,3 +32,16 @@ export const logoutApi = async () => {
   const response = await api.post('/auth/logout');
   return response.data;
 };
+
+/**
+ * עדכון פרטי משתמש
+ */
+export const updateUserApi = async (userId: number, data: {
+  user_name?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+}) => {
+  const response = await api.patch(`/users/${userId}`, data);
+  return response.data;
+};

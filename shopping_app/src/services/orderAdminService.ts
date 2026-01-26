@@ -13,6 +13,14 @@ export const getAllOrdersForAdmin = async (): Promise<Order[]> => {
  * עדכון סטטוס הזמנה (pending, shipped, delivered, cancelled)
  */
 export const updateOrderStatus = async (orderId: number, status: string): Promise<Order> => {
-  const response = await api.patch(`/orders/${orderId}/status`, { status });
+  const response = await api.patch(`/orders/admin/${orderId}/status`, { status });
+  return response.data;
+};
+
+/**
+ * מחיקת הזמנה (אדמין בלבד)
+ */
+export const deleteOrderAdmin = async (orderId: number): Promise<{ message: string }> => {
+  const response = await api.delete(`/orders/admin/${orderId}`);
   return response.data;
 };

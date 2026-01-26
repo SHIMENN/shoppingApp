@@ -1,14 +1,12 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { AdminSidebar } from '../components/admin';
 
 const AdminLayout: React.FC = () => {
   return (
-    <div className="d-flex">
-      <AdminSidebar />
-      <div className="flex-grow-1" style={{ overflowY: 'auto', minHeight: '100vh' }}>
-        <Outlet />
-      </div>
+    // הורדנו את ה-d-flex ואת ה-AdminSidebar
+    <div className="admin-layout-wrapper">
+      {/* ה-Outlet הוא קריטי - הוא זה שמציג את הדפים שלך (Dashboard, Products וכו') */}
+      <Outlet /> 
     </div>
   );
 };

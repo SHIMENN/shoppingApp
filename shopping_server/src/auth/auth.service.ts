@@ -25,26 +25,33 @@ export class AuthService {
 
     async login(user: any) {
         // payload עבור ה-JWT. חשוב להשתמש ב-user_id (עם קו תחתון) כפי שמוגדר ב-Entity
-        const payload = {   
+        const payload = {
             email: user.email,
-            sub: user.user_id, // תיקון: מ-'userId' ל-'user_id'
+            sub: user.user_id,
             role: user.role,
         };
 
         return {
             access_token: this.jwtService.sign(payload),
-            user: {
-                id: user.user_id, // תיקון: התאמה לשם השדה ב-DB
-                username: user.user_name,
+            userData: {
+                user_id: user.user_id,
+                user_name: user.user_name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                created_at: user.created_at,
+                provider: user.provider,
+                picture: user.picture,
             }
         };
     }
 
     async register(registerDto: RegisterDto) {
         const userToCreate = {
-            ...registerDto,
+            user_name: registerDto.username,
+            email: registerDto.email,
+            password: registerDto.password,
             role: UserRole.USER,
         };
         const user = await this.usersService.create(userToCreate);

@@ -1,27 +1,14 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import {Injectable,NotFoundException,BadRequestException,} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Order, OrderStatus } from './entities/order.entity';
+import { Order} from './entities/order.entity';
 import { OrderItem } from '../order-item/entities/order-item.entity';
 import { CartsService } from '../carts/carts.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order.dto';
+import { OrderStatus } from './enums/order.enum';
+import { PaginatedOrders, PaginationOptions } from './enums/orders.interface';
 
-export interface PaginatedOrders {
-  orders: Order[];
-  total: number;
-  page: number;
-  totalPages: number;
-}
-
-export interface PaginationOptions {
-  page: number;
-  limit: number;
-}
 
 @Injectable()
 export class OrdersService {
@@ -142,6 +129,19 @@ export class OrdersService {
     return this.orderRepository.save(order);
   }
 
+  async deleteOrder(userId: number, orderId: number): Promise<{ message: string }> {
+    const order = await this.getOrderById(userId, orderId);
+
+    if (order.status !== OrderStatus.CANCELLED && order.status !== OrderStatus.DELIVERED) {
+      throw new BadRequestException('ניתן למחוק רק הזמנות שבוטלו או נמסרו');
+    }
+
+    await this.orderItemRepository.delete({ order_id: orderId });
+    await this.orderRepository.delete({ order_id: orderId, user_id: userId });
+
+    return { message: 'ההזמנה נמחקה בהצלחה' };
+  }
+
   // Admin methods
   async getAllOrdersForAdmin(
     options?: PaginationOptions,
@@ -226,5 +226,20 @@ export class OrdersService {
       totalRevenue,
       ordersByStatus,
     };
+  }
+
+  async deleteOrderAdmin(orderId: number): Promise<{ message: string }> {
+    const order = await this.orderRepository.findOne({
+      where: { order_id: orderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException('ההזמנה לא נמצאה');
+    }
+
+    await this.orderItemRepository.delete({ order_id: orderId });
+    await this.orderRepository.delete({ order_id: orderId });
+
+    return { message: 'ההזמנה נמחקה בהצלחה' };
   }
 }

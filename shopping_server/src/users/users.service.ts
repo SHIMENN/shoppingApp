@@ -74,7 +74,7 @@ export class UsersService {
   }
 
 async update(userId: number, updateUserDto: UpdateUserDto) {
-  await this.usersRepository.update(userId, updateUserDto);
+  await this.usersRepository.update({ user_id: userId }, updateUserDto);
   return this.findById(userId);
 }
 

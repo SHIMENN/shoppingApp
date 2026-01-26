@@ -1,18 +1,20 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+import React, { useEffect, Suspense} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import MainLayout from './layouts/MainLayout';
-import AdminLayout from './layouts/AdminLayout';
 import { AdminRoute } from './components/routing';
 import FullPageLoader from './components/common/FullPageLoader';
-const Home = lazy(() => import('./pages/Home'));
-const Cart = lazy(() => import('./pages/CartPage'));
-const Login = lazy(() => import('./pages/LoginPage'));
-const Register = lazy(() => import('./pages/Register'));
-const MyOrders = lazy(() => import('./pages/MyOrders'));
-const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'));
-const AdminProducts = lazy(() => import('./pages/Admin/AdminProducts'));
-const AdminOrders = lazy(() => import('./pages/Admin/AdminOrders'));
+import Home from './pages/Home';
+import Cart from './pages/Cart';
+import Login from './pages/LoginPage';
+import Register from './pages/Register';
+import MyOrders from './pages/MyOrders';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminProducts from './pages/Admin/AdminProducts';
+import AdminOrders from './pages/Admin/AdminOrders';
+import Profile from './pages/ProfilePage';
+import CheckoutPage from './pages/CheckoutPage';
+
 
 const App: React.FC = () => {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -40,18 +42,18 @@ const App: React.FC = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
 
 
           </Route>
 
           {/* נתיבים מוגנים למנהלי מערכת (Admin) עם Layout נפרד */}
           <Route element={<AdminRoute />}>
-            <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/products" element={<AdminProducts />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
             </Route>
-          </Route>
 
           {/* נתיב Catch-all למקרה של דף לא נמצא */}
           <Route path="*" element={

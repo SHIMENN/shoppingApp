@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import { useCartStore } from '../store/useCartStore';
 import { loginApi } from '../services/authService';
 import { API_URL } from '../services/api';
 
@@ -13,21 +14,25 @@ export const useLogin = () => {
   const setAuthData = useAuthStore((state) => state.setAuthData);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    
-    try {
-      const { access_token, user } = await loginApi(email, password);
-      setAuthData(user, access_token);
-      navigate('/');
-    } catch (err) {
-      setError('פרטי התחברות שגויים. נסה שוב.');
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
+  setLoading(true);
+
+  try {
+    const { access_token, userData } = await loginApi(email, password);
+    setAuthData(userData, access_token);
+
+    // קריאה לסנכרון מיד לאחר ההתחברות
+    await useCartStore.getState().syncCartWithServer();
+
+    navigate('/');
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'שגיאה בהתחברות');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleGoogleLogin = () => {
     // עדיף להשתמש במשתנה סביבה (ENV) במקום כתובת קשיחה

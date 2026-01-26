@@ -38,21 +38,25 @@ async loginWithCookie(
     @Request()req,
     @Res({passthrough: true}) response: Response,
 ){
-    const  {access_token, user} = await this.authService.login(loginDto);
+    const  {access_token, userData} = await this.authService.login(loginDto);
     response.cookie('access_token',access_token,{
         httpOnly: true,
         secure: process.env.NODE_ENV ===  'production',
         sameSite: 'strict',
         maxAge: 1000 * 60 * 60 * 24, // 1 day
     });
-    return{user};
+    return{userData};
 }
 
 
  @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Request() req) {
+    // מביא את כל פרטי המשתמש מהדאטאבייס ולא רק מה-JWT
+    const user = await this.userService.findById(req.user.userId);
+    if (!user) return null;
+    const { password, ...userData } = user;
+    return userData;
   }
   @Post('logout')
   @HttpCode(HttpStatus.OK)
@@ -68,7 +72,7 @@ async loginWithCookie(
  @Get('google/callback')
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(@Request() req, @Res() res: Response) {
-        const  {access_token, user} = await this.authService.validateOAuthLogin(
+        const  {access_token, userData} = await this.authService.validateOAuthLogin(
             req.user.email,
             'google',
             req.user,

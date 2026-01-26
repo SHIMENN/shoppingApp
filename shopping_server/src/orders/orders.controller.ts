@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Patch,
-  UseGuards,
-  Req,
-  Query,
-  ParseIntPipe,
-  Param,
-  Body,
-} from '@nestjs/common';
+import {Controller,Post,Get,Patch,Delete,UseGuards,Req,Query,ParseIntPipe,Param,Body,} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -44,25 +33,7 @@ export class OrdersController {
     });
   }
 
-  @Get(':orderId')
-  async getOrderById(
-    @Req() req: RequestWithUser,
-    @Param('orderId', ParseIntPipe) orderId: number,
-  ) {
-    const userId = req.user.id;
-    return this.ordersService.getOrderById(userId, orderId);
-  }
-
-  @Patch(':orderId/cancel')
-  async cancelOrder(
-    @Req() req: RequestWithUser,
-    @Param('orderId', ParseIntPipe) orderId: number,
-  ) {
-    const userId = req.user.id;
-    return this.ordersService.cancelOrder(userId, orderId);
-  }
-
-  // Admin routes
+  // Admin routes - MUST be before generic :orderId routes
   @Get('admin/all')
   @UseGuards(AdminGuard)
   async getAllOrders(
@@ -97,5 +68,39 @@ export class OrdersController {
     @Body() updateStatusDto: UpdateOrderStatusDto,
   ) {
     return this.ordersService.updateOrderStatus(orderId, updateStatusDto);
+  }
+
+  @Delete('admin/:orderId')
+  @UseGuards(AdminGuard)
+  async deleteOrderAdmin(@Param('orderId', ParseIntPipe) orderId: number) {
+    return this.ordersService.deleteOrderAdmin(orderId);
+  }
+
+  // User routes with :orderId - MUST be after admin routes
+  @Get(':orderId')
+  async getOrderById(
+    @Req() req: RequestWithUser,
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ) {
+    const userId = req.user.id;
+    return this.ordersService.getOrderById(userId, orderId);
+  }
+
+  @Patch(':orderId/cancel')
+  async cancelOrder(
+    @Req() req: RequestWithUser,
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ) {
+    const userId = req.user.id;
+    return this.ordersService.cancelOrder(userId, orderId);
+  }
+
+  @Delete(':orderId')
+  async deleteOrder(
+    @Req() req: RequestWithUser,
+    @Param('orderId', ParseIntPipe) orderId: number,
+  ) {
+    const userId = req.user.id;
+    return this.ordersService.deleteOrder(userId, orderId);
   }
 }

@@ -3,12 +3,16 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MaxDate } from 'class-validator';
+import { UseGuards } from '@nestjs/common/decorators';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {AdminGuard} from '../auth/guards/admin.guard';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(AdminGuard) 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   async create(
@@ -24,7 +28,7 @@ export class ProductsController {
   ){
     return this.productsService.create(file,createProductDto)
   }
-
+ 
   @Get()
   async findAll() {
     return await this.productsService.findAll();
