@@ -19,8 +19,11 @@ export class Product {
     @Column('int')
     stock: number;
 
-    @Column()
-    image_url: string;
+    @Column({ nullable: true })
+    image_url?: string;
+
+    @Column({ default: false })
+    isDeleted: boolean;
 
     @OneToMany(() => CartItem, cartItem => cartItem.product)
     cartItems: CartItem[];

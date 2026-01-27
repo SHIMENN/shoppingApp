@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Order} from './entities/order.entity';
 import { OrderItem } from '../order-item/entities/order-item.entity';
+import { Product } from '../products/entities/product.entity';
 import { CartsService } from '../carts/carts.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order.dto';
@@ -62,6 +63,27 @@ export class OrdersService {
       );
 
       await queryRunner.manager.save(orderItems);
+
+      // הורדת מלאי מכל מוצר
+      for (const item of cart.cartItems) {
+        if (!item.product) continue;
+
+        const product = await queryRunner.manager.findOne(Product, {
+          where: { product_id: item.product.product_id },
+        });
+
+        if (!product) {
+          throw new NotFoundException(`מוצר ${item.product.name} לא נמצא`);
+        }
+
+        if (product.stock < item.quantity) {
+          throw new BadRequestException(`אין מספיק מלאי עבור ${product.name}`);
+        }
+
+        product.stock -= item.quantity;
+        await queryRunner.manager.save(product);
+      }
+
       await this.cartsService.clearCart(userId);
       await queryRunner.commitTransaction();
 
@@ -125,8 +147,36 @@ export class OrdersService {
       throw new BadRequestException('לא ניתן לבטל הזמנה שכבר עברה עיבוד');
     }
 
-    order.status = OrderStatus.CANCELLED;
-    return this.orderRepository.save(order);
+    // החזרת המלאי
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      for (const item of order.items) {
+        if (!item.product) continue;
+
+        const product = await queryRunner.manager.findOne(Product, {
+          where: { product_id: item.product_id },
+        });
+
+        if (product) {
+          product.stock += item.quantity;
+          await queryRunner.manager.save(product);
+        }
+      }
+
+      order.status = OrderStatus.CANCELLED;
+      await queryRunner.manager.save(order);
+      await queryRunner.commitTransaction();
+
+      return order;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async deleteOrder(userId: number, orderId: number): Promise<{ message: string }> {

@@ -15,10 +15,10 @@ const ProfileField: React.FC<Props> = ({ label, value, isEditing, type = "text",
   <Form.Group className="mb-3">
     <Form.Label className="fw-bold">{label}</Form.Label>
     {isEditing && !readOnly ? (
-      <Form.Control 
-        type={type} 
-        value={value} 
-        onChange={(e) => onChange?.(e.target.value)} 
+      <Form.Control
+        type={type}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
       />
     ) : (
       <Form.Control plaintext readOnly value={value || '-'} />

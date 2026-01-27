@@ -1,77 +1,88 @@
 import React from 'react';
-import { Navbar, Nav, Container, Badge } from 'react-bootstrap';
+import { Navbar, Nav, Container, Badge, Stack } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
+import { FaShoppingCart, FaHome, FaClipboardList, FaUserShield } from 'react-icons/fa';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
 import UserMenu from '../UserMenu/UserMenu';
 
 const AppNavbar: React.FC = () => {
-  const location = useLocation(); // בודק באיזה דף אנחנו
+  const location = useLocation();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const totalItems = useCartStore((state) => state.getTotalItems());
 
-  // פונקציה שעוזרת לנו לקבוע את הצבע: אפור אם זה הדף הנוכחי, כחול אם לא
-  const getButtonClass = (path: string) => {
+  // פונקציה לעיצוב הקישורים באמצעות מחלקות בוטסטראפ בלבד
+  const getLinkClass = (path: string) => {
     const isActive = location.pathname === path;
-    return `nav-link border rounded px-3 ms-lg-2 transition-all ${
-      isActive ? 'bg-secondary text-white' : 'bg-primary text-white'
+    // שימוש ב-text-danger לדף פעיל, text-dark לדף רגיל, ו-fw-bold להדגשה
+    return `nav-link d-flex align-items-center px-3 fw-bold transition-all ${
+      isActive ? 'text-danger border-bottom border-danger border-2' : 'text-dark opacity-75'
     }`;
   };
 
   return (
-    <Navbar bg="primary" variant="dark" expand="lg" sticky="top" className="py-2 shadow-sm">
+    <Navbar bg="white" expand="lg" sticky="top" className="py-2 shadow-sm border-bottom" dir="rtl">
       <Container>
-        {/* דף הבית */}
+        {/* לוגו בעיצוב נקי - שימוש ב-text-danger ו-fw-bolder */}
         <Navbar.Brand 
           as={Link} 
           to="/" 
-          className={getButtonClass('/')}
+          className="fw-bolder fs-3 text-danger d-flex align-items-center"
+          style={{ letterSpacing: '-1px' }}
         >
-          דף הבית
+          כל בו <span className="text-dark ms-1">אקספרס</span>
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        {/* כפתור המבורגר למובייל ללא מסגרת (border-0) */}
+        <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0 shadow-none" />
+
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto text-end align-items-center">
+          <Nav className="me-auto align-items-center">
             
-            {/* כפתור הזמנות */}
+            {/* דף הבית */}
+            <Nav.Link as={Link} to="/" className={getLinkClass('/')}>
+              <FaHome className="ms-2" /> דף הבית
+            </Nav.Link>
+
+            {/* עגלת קניות - שימוש ב-position-relative עבור הבאדג' */}
+            <Nav.Link as={Link} to="/cart" className={getLinkClass('/cart')}>
+              <div className="position-relative ms-2">
+                <FaShoppingCart size={20} />
+                {totalItems > 0 && (
+                  <Badge 
+                    pill 
+                    bg="danger" 
+                    className="position-absolute top-0 start-100 translate-middle border border-light border-2"
+                    style={{ fontSize: '0.6rem' }}
+                  >
+                    {totalItems}
+                  </Badge>
+                )}
+              </div>
+              עגלה
+            </Nav.Link>
+
+            {/* הזמנות שלי */}
             {isAuthenticated && (
-              <Nav.Link 
-                as={Link} 
-                to="/my-orders" 
-                className={getButtonClass('/my-orders')}
-              >
-                הזמנות
+              <Nav.Link as={Link} to="/my-orders" className={getLinkClass('/my-orders')}>
+                <FaClipboardList className="ms-2" /> ההזמנות שלי
               </Nav.Link>
             )}
-            
-            {/* כפתור עגלה */}
-            <Nav.Link 
-              as={Link} 
-              to="/cart" 
-              className={getButtonClass('/cart')}
-            >
-              עגלה 
-              {totalItems > 0 && (
-                <Badge pill bg="danger" className="ms-2">{totalItems}</Badge>
-              )}
-            </Nav.Link>
-            
-            {/* פאנל ניהול */}
+
+            {/* פאנל ניהול - צבע כחול כדי להבדיל (text-primary) */}
             {isAuthenticated && user?.role === 'admin' && (
-              <Nav.Link 
-                as={Link} 
-                to="/admin" 
-                className={getButtonClass ('/admin')}
-              >
-                פאנל ניהול
+              <Nav.Link as={Link} to="/admin" className={getLinkClass('/admin')}>
+                <FaUserShield className="ms-2 text-primary" /> ניהול
               </Nav.Link>
             )}
           </Nav>
-          
-          <Nav className="align-items-center ">
-            <UserMenu />
+
+          {/* אזור המשתמש - עטוף ברקע בהיר ומעוגל (bg-light, rounded-pill) */}
+          <Nav className="align-items-center mt-3 mt-lg-0 ms-lg-3">
+            <Stack direction="horizontal" className="bg-light rounded-pill px-3 py-1 border shadow-sm">
+              <UserMenu />
+            </Stack>
           </Nav>
         </Navbar.Collapse>
       </Container>

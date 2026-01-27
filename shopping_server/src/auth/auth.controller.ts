@@ -6,7 +6,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { UsersService } from 'src/users/users.service';
-
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController  {
@@ -24,7 +24,8 @@ async register(@Body()registerDto: RegisterDto){
 @UseGuards(LocalAuthGuard)
 @Post('login')
 @HttpCode(HttpStatus.OK)
-async login (@Body () logindto:LoginDto,@Request() req){
+@Throttle({ default: { limit: 5, ttl: 60000 } })
+async login (@Body () loginDto:LoginDto,@Request() req){
 
     return this.authService.login(req.user);
 }

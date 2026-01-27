@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Card, Button, Form, Spinner } from 'react-bootstrap';
 import { useProfile } from '../hooks/useProfile';
 import ProfileField from '../components/profile/ProfileField';
@@ -8,6 +8,8 @@ const Profile: React.FC = () => {
     user, isAuthenticated, isEditing, isSaving, formData,
     setFormData, setIsEditing, handleSave, handleCancel, navigate
   } = useProfile();
+
+  const [imageError, setImageError] = useState(false);
 
   if (!isAuthenticated) return null;
 
@@ -22,11 +24,18 @@ const Profile: React.FC = () => {
               <h3 className="mb-0">הפרופיל שלי</h3>
             </Card.Header>
             <Card.Body className="p-4">
-              
+
               {/* Profile Header Image Section */}
               <div className="text-center mb-4">
-                {user?.picture ? (
-                  <img src={user.picture} alt="Profile" className="rounded-circle border border-3 border-danger" style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                {user?.picture && !imageError ? (
+                  <img
+                    src={user.picture}
+                    alt="Profile"
+                    className="rounded-circle border border-3 border-danger"
+                    style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                    referrerPolicy="no-referrer"
+                    onError={() => setImageError(true)}
+                  />
                 ) : (
                   <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center border border-3 border-danger" style={{ width: '100px', height: '100px', fontSize: '2.5rem' }}>👤</div>
                 )}

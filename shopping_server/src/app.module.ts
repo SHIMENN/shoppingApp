@@ -17,13 +17,20 @@ import { Cart } from './carts/entities/cart.entity';
 import { CartItem } from './cart-item/entities/cart-item.entity';
 import { OrderItem } from './order-item/entities/order-item.entity';
 import { CloudinaryModule } from './products/cloudinary/cloudinary.module';  
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
+  
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -53,6 +60,11 @@ import { CloudinaryModule } from './products/cloudinary/cloudinary.module';
 
        
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,{
+      provide:APP_GUARD,
+      useClass:ThrottlerGuard
+    }
+    ],
 })
 export class AppModule {}

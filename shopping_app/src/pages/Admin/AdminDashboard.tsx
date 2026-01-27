@@ -22,7 +22,7 @@ const AdminDashboard: React.FC = () => {
       <Tab.Container id="admin-tabs" defaultActiveKey="products">
         <Row className="g-0">
           {/* סרגל צד ימני */}
-          <Col md={3} lg={2} className="bg-white shadow-sm min-vh-100 p-3 d-flex flex-column sticky-top">
+          <Col md={3} lg={2} className="bg-white shadow-sm p-3 d-flex flex-column sticky-top" style={{ height: '100vh', overflowY: 'auto' }}>
             <div className="text-center mb-4 pt-3">
               <h4 className="fw-bold text-danger">כל בו אקספרס</h4>
               <small className="text-muted">ניהול מערכת</small>

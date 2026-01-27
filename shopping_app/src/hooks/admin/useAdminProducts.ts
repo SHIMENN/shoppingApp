@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useProductStore } from '../../store/useProductStore';
 import { useToast } from '../useToast';
 import api from '../../services/api';
 import {type ProductFormData } from '../../types/admin';
 
 export const useAdminProducts = () => {
-  const { products, loading, loadProducts, deleteProduct } = useProductStore();
+  const { products, deletedProducts, loading, loadProducts, loadDeletedProducts, deleteProduct, restoreProduct } = useProductStore();
   const { toasts, showToast, removeToast } = useToast();
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -18,9 +18,6 @@ export const useAdminProducts = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    loadProducts();
-  }, [loadProducts]);
 
   const handleOpenModal = (product?: any) => {
     if (product) {
@@ -78,7 +75,7 @@ export const useAdminProducts = () => {
       }
 
       setShowModal(false);
-      await loadProducts();
+      await loadProducts(1, 1000);
       showToast(editingProduct ? ' עודכן בהצלחה! ✅' : ' נוסף בהצלחה! ✅', 'success');
     } catch (error) {
       console.error('Error saving product:', error);
@@ -97,9 +94,18 @@ export const useAdminProducts = () => {
     }
   };
 
+  const handleRestore = async (id: number) => {
+    try {
+      await restoreProduct(id);
+      showToast('המוצר שוחזר בהצלחה', 'success');
+    } catch (error) {
+      showToast('שגיאה בשחזור המוצר', 'danger');
+    }
+  };
+
   return {
-    products, loading, toasts, removeToast, showModal, setShowModal,
-    editingProduct, formData, setFormData, handleOpenModal, 
-    handleSubmit, handleDelete, handleImageChange
+    products, deletedProducts, loading, toasts, removeToast, showModal, setShowModal,
+    editingProduct, formData, setFormData, handleOpenModal,
+    handleSubmit, handleDelete, handleImageChange, loadDeletedProducts, handleRestore, loadProducts
   };
 };

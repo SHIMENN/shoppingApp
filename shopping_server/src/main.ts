@@ -3,10 +3,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new AllExceptionsFilter());
    app.use(cookieParser()); 
 
     app.useGlobalPipes(new ValidationPipe({
@@ -14,8 +15,9 @@ async function bootstrap() {
     transform: true,
   }));
 
+
     app.enableCors({
-    origin: true,
+    origin:['http://localhost:5173',process.env.FRONTEND_URL,],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true, //  ל בושח-Cookies!
   });
