@@ -26,6 +26,7 @@ const HomeFilters: React.FC<Props> = ({ searchTerm, setSearchTerm, sortBy, setSo
     </Col>
     <Col md={3} className="mb-3">
       <Form.Select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="text-end">
+        <option value="default">סדר ברירת מחדל</option>
         <option value="name">מיין לפי שם</option>
         <option value="price-asc">מחיר: מהנמוך לגבוה</option>
         <option value="price-desc">מחיר: מהגבוה לנמוך</option>

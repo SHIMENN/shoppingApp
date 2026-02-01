@@ -1,11 +1,13 @@
 import React from 'react';
 import { Modal, Form, Button, Image } from 'react-bootstrap';
 import {type ProductFormData } from '../../types/admin';
+import { type Product } from '../../types/product';
+
 
 interface Props {
   show: boolean;
   onHide: () => void;
-  editingProduct: any;
+  editingProduct:Product | null;
   formData: ProductFormData;
   setFormData: (data: ProductFormData) => void;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

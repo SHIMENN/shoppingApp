@@ -1,3 +1,4 @@
+//כרטיסי מוצרים ריקים מופיעים   בטעינה
 import React from 'react';
 import { Card, Col, Row, Container, Placeholder } from 'react-bootstrap';
 
@@ -20,7 +21,7 @@ const ProductSkeleton: React.FC<ProductSkeletonProps> = ({ count = 6 }) => {
           <Col key={idx}>
             <Card className="shadow-sm border-0">
               {/* מקום לתמונה */}
-              <div style={{ height: '200px', backgroundColor: '#e9ecef' }} />
+              <div className="ratio ratio-16x9 bg-light" />
               
               <Card.Body className="text-end">
                 <Placeholder as={Card.Title} animation="glow">

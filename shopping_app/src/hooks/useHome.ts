@@ -8,7 +8,7 @@ export const useHome = (products: Product[]) => {
   const { toasts, showToast, removeToast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'name' | 'price-asc' | 'price-desc'>('name');
+  const [sortBy, setSortBy] = useState<'default' | 'name' | 'price-asc' | 'price-desc'>('default');
   const [filterStock, setFilterStock] = useState<'all' | 'in-stock' | 'low-stock'>('all');
 
   const handleAddToCart = async (product: Product) => {
@@ -32,6 +32,7 @@ export const useHome = (products: Product[]) => {
         return matchesSearch && matchesStock;
       })
       .sort((a, b) => {
+        if (sortBy === 'default') return 0; // שמור על הסדר המקורי
         if (sortBy === 'name') return a.name.localeCompare(b.name, 'he');
         if (sortBy === 'price-asc') return a.price - b.price;
         return b.price - a.price;

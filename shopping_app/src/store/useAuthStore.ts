@@ -7,13 +7,18 @@ import { useCartStore } from './useCartStore';
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      // מצב ראשוני
+      // --- מצב ראשוני ---
       user: null,
       token: null,
       isAuthenticated: false,
       loading: true,
+      isMenuOpen: false, // סטייט חדש לתפריט
 
-      // עדכון נתונים לאחר התחברות/הרשמה
+      // --- פעולות (Actions) ---
+
+      // שליטה בתפריט
+      setIsMenuOpen: (open: boolean) => set({ isMenuOpen: open }),
+
       setAuthData: (user, token) => {
         set({ 
           user, 
@@ -23,14 +28,18 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
-      // התנתקות
-      logout: () => 
-        {set({ user: null, token: null, isAuthenticated: false,loading: false });
+      logout: () => {
+        set({ 
+          user: null, 
+          token: null, 
+          isAuthenticated: false, 
+          loading: false,
+          isMenuOpen: false // סגירת התפריט בזמן התנתקות
+        });
         localStorage.removeItem('auth-storage'); 
         useCartStore.setState({ cart: [] });
       },
 
-      // עדכון פרטי משתמש
       updateUser: async (data: Partial<User>) => {
         const currentUser = get().user;
         if (!currentUser) return;
@@ -39,7 +48,6 @@ export const useAuthStore = create<AuthState>()(
         set({ user: { ...currentUser, ...updatedUser } });
       },
 
-      // בדיקת אימות מול השרת (בשביל העוגיות של גוגל)
       checkAuth: async () => {
         const wasAuthenticated = get().isAuthenticated;
         set({ loading: true });
@@ -51,7 +59,6 @@ export const useAuthStore = create<AuthState>()(
             loading: false
           });
 
-          // סנכרון עגלת האורח לשרת רק אם זו התחברות חדשה
           if (!wasAuthenticated) {
             await useCartStore.getState().syncCartWithServer();
           }
@@ -59,14 +66,16 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: null,
             isAuthenticated: false,
-            loading: false
+            loading: false,
+            isMenuOpen: false
           });
         }
       },
     }),
     {
-      name: 'auth-storage', // שם המפתח ב-LocalStorage
-      // אנחנו רוצים לשמור רק את ה-user וה-token, לא את ה-loading
+      name: 'auth-storage',
+      // חשוב: אנחנו מוסיפים רק את מה שצריך להישמר בריענון דף
+      // ה-isMenuOpen נשאר בחוץ כדי שיתאפס ל-false בכל טעינה
       partialize: (state) => ({ 
         user: state.user, 
         token: state.token, 

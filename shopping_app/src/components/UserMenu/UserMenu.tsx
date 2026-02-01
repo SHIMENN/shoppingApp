@@ -1,74 +1,87 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Dropdown, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaSignOutAlt, FaUserPlus, FaSignInAlt, FaChevronDown } from 'react-icons/fa';
 import { useAuthStore } from '../../store/useAuthStore';
-import { handleLogout } from './UserMenu.logic';
+import { handleLogoutAction } from './UserMenu.logic';
+
+// Custom Toggle כדי למנוע את החץ הכפול של בוטסטראפ
+const CustomToggle = React.forwardRef(({ children, onClick }: any, ref: any) => (
+  <div
+    ref={ref}
+    role="button"
+    className="d-flex align-items-center gap-3 text-dark border-0 p-0 bg-transparent shadow-none"
+    onClick={(e) => {
+      e.preventDefault();
+      onClick(e);
+    }}
+  >
+    {children}
+  </div>
+));
 
 const UserMenu: React.FC = () => {
-  const [show, setShow] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, logout, user } = useAuthStore();
+  const { isAuthenticated, logout, user, isMenuOpen, setIsMenuOpen } = useAuthStore();
 
   return (
-    <div 
-      className="d-inline-block position-relative"
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
-    >
-      <Dropdown show={show} align="start">
-        {/* כפתור הניווט הראשי */}
-        <Dropdown.Toggle 
-          as={Button}
-          variant={isAuthenticated ? "outline-danger" : "light"}
-          className="rounded-pill px-3 py-2 d-flex align-items-center shadow-sm border-2 fw-bold"
-          style={{ fontSize: '0.9rem' }}
-          onClick={() => !isAuthenticated && navigate('/login')}
-        >
-          <FaChevronDown className="me-2 small" size={10} />
-          
-          <span className="mx-2">
-            {isAuthenticated ? `שלום ${user?.user_name?.split(' ')[0]}` : 'התחברות'}
-          </span>
-          
-          <FaUser size={14} className={isAuthenticated ? "text-danger" : "text-muted"} />
+    <div className="d-inline-block">
+      <Dropdown show={isMenuOpen} onToggle={(next) => setIsMenuOpen(next)}>
+
+        <Dropdown.Toggle as={CustomToggle}>
+          <i className="bi bi-chevron-down text-muted small" />
+
+          <div className="d-flex flex-column text-end">
+            <span className="text-muted small lh-1 mb-1">ברוכים הבאים</span>
+            <span className="fw-bold small lh-1 text-nowrap">
+              {isAuthenticated ? user?.user_name?.split(' ')[0] : 'התחבר / הרשמה'}
+            </span>
+          </div>
+
+          <i className="bi bi-person-circle text-muted fs-5" />
         </Dropdown.Toggle>
 
-        {/* תפריט נקי - ללא כותרת "אזור אישי" */}
-        <Dropdown.Menu 
-          show={show} 
-          className="shadow-lg border-0 rounded-3 overflow-hidden text-end m-0 p-0"
-          style={{ minWidth: '180px' }}
+        <Dropdown.Menu
+          className="shadow border-0 rounded-4 p-4 mt-2 text-center start-50 translate-middle-x w-auto"
         >
-          {/* pt-2 שומר על רצף ה-Hover כדי שהחלון לא ייסגר */}
-          <div className="pt-2 bg-transparent"> 
-            <div className="bg-white">
-              {isAuthenticated ? (
-                <>
-                  {/* ישר לאופציות - בלי השם למעלה */}
-                  <Dropdown.Item onClick={() => navigate('/profile')} className="py-3 border-bottom text-dark">
-                    הפרופיל שלי <FaUser className="ms-2 text-muted" size={12} />
-                  </Dropdown.Item>
-                  
-                  <Dropdown.Item 
-                    onClick={() => handleLogout(logout, navigate)} 
-                    className="py-3 text-danger fw-bold"
-                  >
-                    התנתקות <FaSignOutAlt className="ms-2" size={12} />
-                  </Dropdown.Item>
-                </>
-              ) : (
-                <>
-                  <Dropdown.Item onClick={() => navigate('/login')} className="py-3 border-bottom">
-                    כניסה למערכת <FaSignInAlt className="ms-2 text-muted" />
-                  </Dropdown.Item>
-                  <Dropdown.Item onClick={() => navigate('/register')} className="py-3">
-                    הרשמה <FaUserPlus className="ms-2 text-muted" />
-                  </Dropdown.Item>
-                </>
-              )}
-            </div>
-          </div>
+          {!isAuthenticated ? (
+            <>
+              <i className="bi bi-person-circle d-block mb-2 text-secondary fs-1" />
+
+              <div className="d-grid mb-3">
+                <Button
+                  variant="dark"
+                  className="rounded-pill py-2 fw-bold text-white border-0 shadow-none"
+                  onClick={() => { navigate('/login'); setIsMenuOpen(false); }}
+                >
+                  התחבר
+                </Button>
+              </div>
+
+              <div
+                className="text-danger fw-bold small py-1"
+                role="button"
+                onClick={() => { navigate('/register'); setIsMenuOpen(false); }}
+              >
+                הרשם
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="pb-3 mb-2 border-bottom text-center">
+                <i className="bi bi-person-circle d-block mb-1 text-secondary fs-2" />
+                <span className="text-muted small">שלום,</span>
+                <div className="fw-bold text-dark text-truncate">{user?.user_name}</div>
+              </div>
+
+              <Dropdown.Item
+                onClick={() => handleLogoutAction(logout, navigate)}
+                className="text-danger fw-bold py-2 bg-transparent border-0 shadow-none d-flex align-items-center justify-content-center"
+              >
+                <span className="me-2">התנתקות</span>
+                <i className="bi bi-box-arrow-right fs-6" />
+              </Dropdown.Item>
+            </>
+          )}
         </Dropdown.Menu>
       </Dropdown>
     </div>

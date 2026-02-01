@@ -6,9 +6,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 
-// הגדרת ממשק לתשובת דפדופ (עוזר לסדר בתיעוד ובקוד)
+// הגדרת ממשק לתשובת דפדופ עם הישות המקורית
 export interface PaginatedProducts {
-  data: any[];
+  data: Product[];
   total: number;
   page: number;
   limit: number;
@@ -23,29 +23,27 @@ export class ProductsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async create(file: Express.Multer.File | undefined, createProductDto: CreateProductDto): Promise<any> {
+  async create(file: Express.Multer.File | undefined, createProductDto: CreateProductDto): Promise<Product> {
     try {
-      let imageUrl:  string | undefined = undefined;
+      let imageUrl: string | undefined = undefined;
       if (file) {
         const result = await this.cloudinaryService.uploadImage(file);
         imageUrl = result.secure_url;
+      }
+      
+      const product = this.productRepository.create({
+        ...createProductDto,
+        image_url: imageUrl,
+      });
+      
+      return await this.productRepository.save(product);
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error;
     }
-    const product = this.productRepository.create({
-      ...createProductDto,
-      image_url:imageUrl,
-    });
-    
-    const savedProduct = await this.productRepository.save(product);
-    return { ...savedProduct, id: savedProduct.product_id };
-  }catch (error) {
-    // הדפסת השגיאה לטרמינל כדי שתוכל לראות אם יש בעיה ב-DB או ב-Cloudinary
-    console.error('Error creating product:', error);
-    throw error;
   }
-}
 
   async findAll(page: number = 1, limit: number = 20): Promise<PaginatedProducts> {
-    // שימוש ב-findAndCount לביצועים אופטימליים
     const [products, total] = await this.productRepository.findAndCount({
       where: { isDeleted: false },
       skip: (page - 1) * limit,
@@ -53,14 +51,8 @@ export class ProductsService {
       order: { product_id: 'ASC' },
     });
 
-    // מיפוי השדות כדי להוסיף 'id' עבור הקליינט כפי שביקשת
-    const mappedData = products.map(product => ({
-      ...product,
-      id: product.product_id,
-    }));
-
     return {
-      data: mappedData,
+      data: products,
       total,
       page,
       limit,
@@ -68,7 +60,7 @@ export class ProductsService {
     };
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { product_id: id, isDeleted: false },
       relations: ['cartItems', 'orderItems'],
@@ -78,11 +70,11 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
-    return { ...product, id: product.product_id };
+    return product;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto, file?: Express.Multer.File): Promise<any> {
-    const product = await this.findOne(id); // שימוש ב-findOne הקיים כדי לחסוך קוד
+  async update(id: number, updateProductDto: UpdateProductDto, file?: Express.Multer.File): Promise<Product> {
+    const product = await this.findOne(id);
 
     if (file) {
       const result = await this.cloudinaryService.uploadImage(file);
@@ -90,9 +82,7 @@ export class ProductsService {
     }
 
     Object.assign(product, updateProductDto);
-    const updatedProduct = await this.productRepository.save(product);
-
-    return { ...updatedProduct, id: updatedProduct.product_id };
+    return await this.productRepository.save(product);
   }
 
   async remove(id: number): Promise<void> {
@@ -109,13 +99,8 @@ export class ProductsService {
       order: { product_id: 'ASC' },
     });
 
-    const mappedData = products.map(product => ({
-      ...product,
-      id: product.product_id,
-    }));
-
     return {
-      data: mappedData,
+      data: products,
       total,
       page,
       limit,
@@ -123,7 +108,7 @@ export class ProductsService {
     };
   }
 
-  async restore(id: number): Promise<any> {
+  async restore(id: number): Promise<Product> {
     const product = await this.productRepository.findOne({
       where: { product_id: id, isDeleted: true },
     });
@@ -133,11 +118,11 @@ export class ProductsService {
     }
 
     product.isDeleted = false;
-    const restoredProduct = await this.productRepository.save(product);
-    return { ...restoredProduct, id: restoredProduct.product_id };
+    return await this.productRepository.save(product);
   }
-  async createBulk(productsDto: CreateProductDto[]) {
-  const newProducts = this.productRepository.create(productsDto);
-  return await this.productRepository.save(newProducts);
-}
+
+  async createBulk(productsDto: CreateProductDto[]): Promise<Product[]> {
+    const newProducts = this.productRepository.create(productsDto);
+    return await this.productRepository.save(newProducts);
+  }
 }

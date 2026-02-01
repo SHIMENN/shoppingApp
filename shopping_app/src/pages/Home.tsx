@@ -43,7 +43,7 @@ const Home: React.FC = () => {
     toasts, removeToast
   } = useHome(products || []);
 
-  if (loading) return <ProductSkeleton count={8} />;
+  if (loading) return <ProductSkeleton count={8} />;//הצגת מוצרים ריקים
   if (error) return <Alert variant="danger" className="m-5 text-center">{error}</Alert>;
 
   return (
@@ -79,7 +79,7 @@ const Home: React.FC = () => {
           <Row xs={1} md={2} lg={3} xl={4} className="g-4">
             {filteredProducts.map((product) => (
               <Col key={product.product_id}>
-                <ProductCard
+                <ProductCard //הצגת מוצרים
                   product={product}
                   onClick={(p) => setSelectedProduct(p)}
                 />

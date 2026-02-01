@@ -27,8 +27,11 @@ export interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  isMenuOpen: boolean;
   setAuthData: (user: User, token: string) => void;
   logout: () => void;
   updateUser: (data: Partial<User>) => Promise<void>;
   checkAuth: () => Promise<void>;
+  setIsMenuOpen: (open: boolean) => void;
+
 }

@@ -1,3 +1,4 @@
+//הצגת מוצר בף הבית
 import React from 'react';
 import { Card, Badge } from 'react-bootstrap';
 import { type Product } from '../../types/product';
@@ -19,7 +20,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
         <Card.Img
           variant="top"
           src={product.image_url || 'https://via.placeholder.com/300'}
-          style={{ height: '220px', objectFit: 'cover' }}
+          style={{ height: '200px', objectFit: 'cover' }}
         />
         {product.stock <= 0 && (
           <Badge bg="secondary" className="position-absolute top-0 end-0 m-2 py-2 px-3">
