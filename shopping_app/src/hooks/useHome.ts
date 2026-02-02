@@ -1,15 +1,39 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useCartStore } from '../store/useCartStore';
 import { useToast } from '../hooks/useToast';
 import type { Product } from '../types/product';
 
-export const useHome = (products: Product[]) => {
+export const useHome = (products: Product[], loadAll?: () => void) => {
   const addToCart = useCartStore((state) => state.addToCart);
   const { toasts, showToast, removeToast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'default' | 'name' | 'price-asc' | 'price-desc'>('default');
-  const [filterStock, setFilterStock] = useState<'all' | 'in-stock' | 'low-stock'>('all');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
+  const [priceInited, setPriceInited] = useState(false);
+
+  // חישוב טווח המחירים מכל המוצרים
+  const maxPrice = useMemo(() => {
+    if (!products.length) return 0;
+    return Math.ceil(Math.max(...products.map(p => p.price)));
+  }, [products]);
+
+  // אתחול טווח המחירים פעם אחת כשהמוצרים נטענים
+  useEffect(() => {
+    if (maxPrice > 0 && !priceInited) {
+      setPriceRange([0, maxPrice]);
+      setPriceInited(true);
+    }
+  }, [maxPrice, priceInited]);
+
+  const isPriceFiltered = priceInited && (priceRange[0] > 0 || priceRange[1] < maxPrice);
+
+  // כשיש חיפוש או סינון פעיל - טוען את כל המוצרים
+  useEffect(() => {
+    if ((searchTerm || isPriceFiltered) && loadAll) {
+      loadAll();
+    }
+  }, [searchTerm, isPriceFiltered, loadAll]);
 
   const handleAddToCart = async (product: Product) => {
     try {
@@ -26,23 +50,22 @@ export const useHome = (products: Product[]) => {
       .filter((product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                              product.description?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStock = filterStock === 'all' ||
-                            (filterStock === 'in-stock' && product.stock > 0) ||
-                            (filterStock === 'low-stock' && product.stock > 0 && product.stock < 10);
-        return matchesSearch && matchesStock;
+        const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+        return matchesSearch && matchesPrice;
       })
       .sort((a, b) => {
-        if (sortBy === 'default') return 0; // שמור על הסדר המקורי
+        if (sortBy === 'default') return 0;
         if (sortBy === 'name') return a.name.localeCompare(b.name, 'he');
         if (sortBy === 'price-asc') return a.price - b.price;
         return b.price - a.price;
       });
-  }, [products, searchTerm, sortBy, filterStock]);
+  }, [products, searchTerm, sortBy, priceRange]);
 
   return {
     searchTerm, setSearchTerm,
     sortBy, setSortBy,
-    filterStock, setFilterStock,
+    priceRange, setPriceRange,
+    maxPrice, isPriceFiltered,
     filteredProducts,
     handleAddToCart,
     toasts, removeToast

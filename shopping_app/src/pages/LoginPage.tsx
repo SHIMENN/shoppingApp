@@ -9,7 +9,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '70vh' }}>
       <Card style={{ width: '400px' }} className="shadow p-4">
         <h2 className="text-center mb-4 fw-bold">התחברות</h2>
 
@@ -59,7 +59,7 @@ const LoginPage: React.FC = () => {
           אין לך חשבון? <Link to="/register" className="text-decoration-none">הרשמה</Link>
         </div>
       </Card>
-    </>
+    </div>
   );
 };
 

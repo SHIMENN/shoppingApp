@@ -33,8 +33,8 @@ const ProductTable: React.FC<Props> = ({ products, onEdit, onDelete }) => (
           </td>
           <td>
             <div className="d-flex gap-2 justify-content-center">
-              <Button variant="primary" size="sm" onClick={() => onEdit(p)}>✏️ ערוך</Button>
-              <Button variant="danger" size="sm" onClick={() => onDelete(p.product_id)}>🗑️ מחק</Button>
+              <Button variant="primary" size="sm" onClick={() => onEdit(p)}>ערוך</Button>
+              <Button variant="danger" size="sm" onClick={() => onDelete(p.product_id)}>מחק</Button>
             </div>
           </td>
         </tr>

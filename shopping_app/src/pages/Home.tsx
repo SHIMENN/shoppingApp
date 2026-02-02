@@ -18,7 +18,7 @@ import { type Product } from '../types/product';
 
 
 const Home: React.FC = () => {
-  const { products, loading, loadingMore, error, hasMore, loadMore } = useProducts();
+  const { products, loading, loadingMore, error, hasMore, loadMore, loadAll } = useProducts();
   const addToCartGlobal = useCartStore(state => state.addToCart);
   const navigate = useNavigate();
   // הפעלת הגלילה האינסופית דרך ה-Hook המופרד
@@ -28,9 +28,9 @@ const Home: React.FC = () => {
 
   const {
     searchTerm, setSearchTerm, sortBy, setSortBy,
-    filterStock, setFilterStock, filteredProducts,
-    handleAddToCart, toasts, removeToast
-  } = useHome(products || []);
+    priceRange, setPriceRange, maxPrice, isPriceFiltered,
+    filteredProducts, handleAddToCart, toasts, removeToast
+  } = useHome(products || [], loadAll);
 
   if (loading) return <ProductSkeleton count={8} />;
   if (error) return <Alert variant="danger" className="m-5 text-center">{error}</Alert>;
@@ -46,17 +46,20 @@ const Home: React.FC = () => {
         </div>
 
         {/* פילטרים */}
-        <HomeFilters 
+        <HomeFilters
           searchTerm={searchTerm} setSearchTerm={setSearchTerm}
           sortBy={sortBy} setSortBy={setSortBy}
-          filterStock={filterStock} setFilterStock={setFilterStock}
+          priceRange={priceRange} setPriceRange={setPriceRange}
+          maxPrice={maxPrice}
         />
 
-        <div className="mb-3 text-end">
-          <Badge bg="primary" className="py-2 px-3">
-            {filteredProducts.length} מוצרים נמצאו
-          </Badge>
-        </div>
+        {(searchTerm || isPriceFiltered) && (
+          <div className="mb-3 text-end">
+            <Badge bg="primary" className="py-2 px-3">
+              {filteredProducts.length} מוצרים נמצאו
+            </Badge>
+          </div>
+        )}
 
         {/* גריד המוצרים */}
         {filteredProducts.length === 0 ? (

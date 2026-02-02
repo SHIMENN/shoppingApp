@@ -8,7 +8,7 @@ const Register: React.FC = () => {
   const { formData, showPassword, setShowPassword, handleSubmit, updateField } = useRegister();
 
   return (
-    <>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '70vh' }}>
       <Card style={{ width: '450px' }} className="shadow p-4">
         <h2 className="text-center mb-4 fw-bold">הרשמה</h2>
 
@@ -88,7 +88,7 @@ const Register: React.FC = () => {
           כבר יש לך חשבון? <Link to="/login" className="text-decoration-none">התחבר כאן</Link>
         </div>
       </Card>
-    </>
+    </div>
   );
 };
 

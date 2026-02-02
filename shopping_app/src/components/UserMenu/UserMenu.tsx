@@ -74,6 +74,14 @@ const UserMenu: React.FC = () => {
               </div>
 
               <Dropdown.Item
+                onClick={() => { navigate('/profile'); setIsMenuOpen(false); }}
+                className="py-2 text-dark bg-transparent border-0 shadow-none d-flex align-items-center justify-content-center"
+              >
+                <span className="me-2">הפרופיל שלי</span>
+                <i className="bi bi-person fs-6" />
+              </Dropdown.Item>
+
+              <Dropdown.Item
                 onClick={() => handleLogoutAction(logout, navigate)}
                 className="text-danger fw-bold py-2 bg-transparent border-0 shadow-none d-flex align-items-center justify-content-center"
               >
