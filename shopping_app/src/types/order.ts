@@ -27,27 +27,3 @@ export interface Order {
   items?: OrderItem[];
   user?: User;
 }
-
-export interface OrderAccordionItemProps {
-  order: Order;
-  eventKey: string;
-  onDelete: (orderId: number) => void;
-  isDeleting: boolean;
-}
-
-export interface AdminOrderAccordionItemProps extends OrderAccordionItemProps {
-  onStatusChange: (orderId: number, newStatus: string) => void;
-  isUpdating: boolean;
-}
-
-export interface OrderStatsCardsProps {
-  totalOrders: number;
-  deliveredOrders: number;
-  pendingOrders: number;
-}
-
-export interface AdminOrderStatsCardsProps extends OrderStatsCardsProps {
-  shippedOrders: number;
-  cancelledOrders: number;
-  totalRevenue: number;
-}

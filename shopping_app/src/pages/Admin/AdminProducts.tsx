@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Button, Spinner, Tab, Tabs, Table } from 'react-bootstrap';
+import { Button, Spinner, Tab, Tabs, Table } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import ToastNotification from '../../components/common/ToastNotification';
 import { useAdminProducts } from '../../hooks/admin/useAdminProducts';
@@ -35,7 +35,7 @@ const AdminProducts: React.FC = () => {
   return (
     <>
       <ToastNotification toasts={toasts} onClose={removeToast} />
-      <Container className="mt-4">
+      <>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <Button variant="success" onClick={() => handleOpenModal()}>+ הוסף מוצר חדש</Button>
           <h2 className="fw-bold mb-0">ניהול קטלוג מוצרים</h2>
@@ -104,7 +104,7 @@ const AdminProducts: React.FC = () => {
           handleImageChange={handleImageChange}
           onSubmit={handleSubmit}
         />
-      </Container>
+      </>
     </>
   );
 };

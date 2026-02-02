@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Accordion, Button, Spinner, Alert } from 'react-bootstrap';
+import { Accordion, Button, Spinner, Alert } from 'react-bootstrap';
 import { FaRedo } from 'react-icons/fa';
 import { useAdminOrders } from '../../hooks/admin/useAdminOrders';
 import ToastNotification from '../../components/common/ToastNotification';
@@ -16,14 +16,13 @@ const AdminOrders: React.FC = () => {
 
   if (loading) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
         <div className="text-center"><Spinner animation="border" variant="primary" /><p className="mt-3 text-muted">טוען הזמנות...</p></div>
-      </Container>
+     
     );
   }
 
   return (
-    <Container fluid className="py-4" dir="rtl">
+    <>
       <ToastNotification toasts={toasts} onClose={removeToast} />
 
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -60,7 +59,7 @@ const AdminOrders: React.FC = () => {
           ))}
         </Accordion>
       )}
-    </Container>
+    </>
   );
 };
 

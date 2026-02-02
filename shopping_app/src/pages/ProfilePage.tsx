@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Card, Button, Form, Spinner } from 'react-bootstrap';
+import { Row, Col, Card, Button, Form, Spinner } from 'react-bootstrap';
 import { useProfile } from '../hooks/useProfile';
 import ProfileField from '../components/profile/ProfileField';
 
@@ -16,7 +16,7 @@ const Profile: React.FC = () => {
   const isGoogleUser = user?.provider === 'google';
 
   return (
-    <Container className="py-5">
+    <>
       <Row className="justify-content-center">
         <Col md={8} lg={6}>
           <Card className="shadow-sm border-0">
@@ -79,7 +79,7 @@ const Profile: React.FC = () => {
           </Card>
         </Col>
       </Row>
-    </Container>
+    </>
   );
 };
 

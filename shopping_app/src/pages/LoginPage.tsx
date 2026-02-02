@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Form, Button, Card, Alert, InputGroup } from 'react-bootstrap';
+import {Form, Button, Card, Alert, InputGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
 import SocialButtons from '../components/auth/SocialButtons';
@@ -9,7 +9,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Container className="d-flex justify-content-center mt-5">
+    <>
       <Card style={{ width: '400px' }} className="shadow p-4">
         <h2 className="text-center mb-4 fw-bold">התחברות</h2>
 
@@ -21,7 +21,7 @@ const LoginPage: React.FC = () => {
             <Form.Control
               type="email"
               required
-              placeholder="name@example.com"
+              placeholder="הכנס אימייל"
               onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
@@ -59,7 +59,7 @@ const LoginPage: React.FC = () => {
           אין לך חשבון? <Link to="/register" className="text-decoration-none">הרשמה</Link>
         </div>
       </Card>
-    </Container>
+    </>
   );
 };
 

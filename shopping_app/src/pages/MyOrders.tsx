@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Card, Accordion, Button } from 'react-bootstrap';
+import {  Card, Accordion, Button } from 'react-bootstrap';
 import { FaRedo } from 'react-icons/fa';
 import { OrderStatsCards, OrderAccordionItem } from '../components/orders';
 import { useOrders } from '../hooks/useOrders';
@@ -18,7 +18,7 @@ const MyOrders: React.FC = () => {
   if (error) return <OrderError message={error} onRetry={loadOrders} />;
 
   return (
-    <Container className="py-4" dir="rtl">
+    <>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="fw-bold mb-1">ההזמנות שלי</h2>
@@ -61,7 +61,7 @@ const MyOrders: React.FC = () => {
           </Accordion>
         </>
       )}
-    </Container>
+    </>
   );
 };
 

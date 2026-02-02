@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Nav, Tab, Card, Button } from 'react-bootstrap';
+import { Row, Col, Nav, Tab, Card, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaBoxes, FaClipboardList, FaHome, FaSignOutAlt } from 'react-icons/fa';
 import { useAuthStore } from '../../store/useAuthStore'; // הנחה שזה מיקום ה-store שלך
@@ -18,7 +18,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <Container fluid className="bg-light min-vh-100 p-0" dir="rtl">
+    <>
       <Tab.Container id="admin-tabs" defaultActiveKey="products">
         <Row className="g-0">
           {/* סרגל צד ימני */}
@@ -77,7 +77,7 @@ const AdminDashboard: React.FC = () => {
                 <Tab.Content>
                   <Tab.Pane eventKey="products">
                     <div className="mb-4">
-                      <h3 className="fw-bold text-dark">📦 קטלוג מוצרים</h3>
+                      <h3 className="fw-bold text-dark">קטלוג מוצרים</h3>
                       <p className="text-muted">ניהול מלאי ומוצרים</p>
                     </div>
                     <AdminProducts />
@@ -85,7 +85,7 @@ const AdminDashboard: React.FC = () => {
                   
                   <Tab.Pane eventKey="orders">
                     <div className="mb-4">
-                      <h3 className="fw-bold text-dark">📑 ניהול הזמנות</h3>
+                      <h3 className="fw-bold text-dark">ניהול הזמנות</h3>
                       <p className="text-muted">מעקב אחר הזמנות לקוחות</p>
                     </div>
                     <AdminOrders />
@@ -96,7 +96,7 @@ const AdminDashboard: React.FC = () => {
           </Col>
         </Row>
       </Tab.Container>
-    </Container>
+    </>
   );
 };
 

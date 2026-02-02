@@ -14,7 +14,7 @@ import AdminProducts from './pages/Admin/AdminProducts';
 import AdminOrders from './pages/Admin/AdminOrders';
 import Profile from './pages/ProfilePage';
 import CheckoutPage from './pages/CheckoutPage';
-
+import AdminLayout from './layouts/AdminLayout';
 
 const App: React.FC = () => {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -50,9 +50,11 @@ const App: React.FC = () => {
 
           {/* נתיבים מוגנים למנהלי מערכת (Admin) עם Layout נפרד */}
           <Route element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/products" element={<AdminProducts />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
+              </Route>
             </Route>
 
           {/* נתיב Catch-all למקרה של דף לא נמצא */}

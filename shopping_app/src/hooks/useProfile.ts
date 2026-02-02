@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
+import { useRequireAuth } from './useRequireAuth';
+
+const getUserFormDefaults = (user: { user_name?: string; first_name?: string; last_name?: string; email?: string }) => ({
+  user_name: user.user_name || '',
+  first_name: user.first_name || '',
+  last_name: user.last_name || '',
+  email: user.email || '',
+});
 
 export const useProfile = () => {
   const { user, isAuthenticated, updateUser } = useAuthStore();
   const navigate = useNavigate();
+  useRequireAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -16,17 +25,8 @@ export const useProfile = () => {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) navigate('/login');
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
     if (user) {
-      setFormData({
-        user_name: user.user_name || '',
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        email: user.email || '',
-      });
+      setFormData(getUserFormDefaults(user));
     }
   }, [user]);
 
@@ -61,12 +61,7 @@ export const useProfile = () => {
 
   const handleCancel = () => {
     if (user) {
-      setFormData({
-        user_name: user.user_name || '',
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        email: user.email || '',
-      });
+      setFormData(getUserFormDefaults(user));
     }
     setIsEditing(false);
   };

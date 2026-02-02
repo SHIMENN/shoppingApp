@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Alert, Button } from 'react-bootstrap';
+import {Row, Col, Alert, Button } from 'react-bootstrap';
 import { FaArrowRight } from 'react-icons/fa';
 import { useCheckout } from '../hooks/useCheckout';
 import CheckoutSummary from '../components/checkout/CheckoutSummary';
@@ -17,7 +17,7 @@ const CheckoutPage: React.FC = () => {
   if (cart.length === 0) return < EmptyCart/>;
 
   return (
-    <Container className="py-4" dir="rtl">
+    <>
       {/* Header */}
       <div className="d-flex align-items-center mb-4">
         <Button variant="link" className="p-0 me-3 text-dark" onClick={() => navigate('/cart')}>
@@ -49,7 +49,7 @@ const CheckoutPage: React.FC = () => {
           />
         </Col>
       </Row>
-    </Container>
+    </>
   );
 };
 

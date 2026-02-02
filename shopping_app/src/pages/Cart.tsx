@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Table } from 'react-bootstrap';
+import {Row, Col, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -27,7 +27,7 @@ const CartPage: React.FC = () => {
   }
 
   return (
-    <Container className="py-4">
+    <>
       <h2 className="mb-4 fw-bold">סל הקניות שלך</h2>
       <Row>
         {/* צד ימין: רשימת המוצרים */}
@@ -61,7 +61,7 @@ const CartPage: React.FC = () => {
           />
         </Col>
       </Row>
-    </Container>
+    </>
   );
 };
 

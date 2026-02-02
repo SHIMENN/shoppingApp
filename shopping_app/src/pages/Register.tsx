@@ -1,6 +1,6 @@
 // pages/Register.tsx
 import React from 'react';
-import { Container, Form, Button, Card, InputGroup } from 'react-bootstrap';
+import { Form, Button, Card, InputGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useRegister } from '../hooks/useRegister';
 
@@ -8,7 +8,7 @@ const Register: React.FC = () => {
   const { formData, showPassword, setShowPassword, handleSubmit, updateField } = useRegister();
 
   return (
-    <Container className="d-flex justify-content-center mt-5" dir="rtl">
+    <>
       <Card style={{ width: '450px' }} className="shadow p-4">
         <h2 className="text-center mb-4 fw-bold">הרשמה</h2>
 
@@ -88,7 +88,7 @@ const Register: React.FC = () => {
           כבר יש לך חשבון? <Link to="/login" className="text-decoration-none">התחבר כאן</Link>
         </div>
       </Card>
-    </Container>
+    </>
   );
 };
 
