@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useProductStore } from '../../store/useProductStore';
 import { useToast } from '../useToast';
 import api from '../../services/api';
-import {type ProductFormData } from '../../types/admin';
+import { type ProductFormData } from '../../types/admin';
 
 export const useAdminProducts = () => {
   const { products, deletedProducts, loading, loadProducts, loadDeletedProducts, deleteProduct, restoreProduct } = useProductStore();
@@ -88,7 +88,7 @@ export const useAdminProducts = () => {
       try {
         await deleteProduct(id);
         showToast('המוצר נמחק', 'success');
-      } catch (error) {
+      } catch {
         showToast('שגיאה במחיקת המוצר', 'danger');
       }
     }
@@ -98,7 +98,7 @@ export const useAdminProducts = () => {
     try {
       await restoreProduct(id);
       showToast('המוצר שוחזר בהצלחה', 'success');
-    } catch (error) {
+    } catch {
       showToast('שגיאה בשחזור המוצר', 'danger');
     }
   };

@@ -52,7 +52,7 @@ export const useProfile = () => {
       await updateUser(dataToUpdate);
       setIsEditing(false);
       alert('הפרטים עודכנו בהצלחה!');
-    } catch (error) {
+    } catch {
       alert('שגיאה בעדכון הפרטים');
     } finally {
       setIsSaving(false);

@@ -28,20 +28,20 @@ const AdminOrderItem: React.FC<Props> = ({ order, index, updatingOrderId, deleti
   return (
     <Accordion.Item eventKey={String(index)} className="border-0 shadow-sm mb-3 rounded overflow-hidden">
       <Accordion.Header>
-        <div className="d-flex justify-content-between align-items-center w-100 pe-3">
-          <div className="d-flex align-items-center">
-            <div className="rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" 
-                 style={{ backgroundColor: `${statusInfo.color}20`, color: statusInfo.color, width: 40, height: 40 }}>
+        <div className="d-flex flex-wrap align-items-center w-100 pe-2 gap-2">
+          <div className="d-flex align-items-center flex-shrink-0">
+            <div className="rounded-circle p-2 me-2 d-flex align-items-center justify-content-center"
+                 style={{ backgroundColor: `${statusInfo.color}20`, color: statusInfo.color, width: 36, height: 36 }}>
               {statusInfo.icon}
             </div>
             <div>
-              <div className="fw-bold">הזמנה #{order.order_id}</div>
-              <small className="text-muted">{new Date(order.order_date).toLocaleDateString('he-IL')}</small>
+              <div className="fw-bold small">הזמנה #{order.order_id}</div>
+              <small className="text-muted" style={{ fontSize: '0.75rem' }}>{new Date(order.order_date).toLocaleDateString('he-IL')}</small>
             </div>
           </div>
-          <div className="d-flex align-items-center gap-3">
-            <Badge bg={statusInfo.bg} className="px-3 py-2">{statusInfo.text}</Badge>
-            <span className="fw-bold text-success">₪{Number(order.total_amount).toFixed(2)}</span>
+          <div className="d-flex align-items-center gap-2 ms-auto">
+            <Badge bg={statusInfo.bg} className="px-2 py-1">{statusInfo.text}</Badge>
+            <span className="fw-bold text-success small">₪{Number(order.total_amount).toFixed(2)}</span>
           </div>
         </div>
       </Accordion.Header>

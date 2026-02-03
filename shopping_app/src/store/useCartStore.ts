@@ -20,7 +20,7 @@ export const useCartStore = create<CartState>()(
         try {
           const response = await api.get('/cart');
           set({ cart: response.data.cartItems || [], loading: false });
-        } catch (error) {
+        } catch {
           set({ error: 'שגיאה בטעינת העגלה', loading: false });
         }
       },
@@ -32,7 +32,7 @@ export const useCartStore = create<CartState>()(
         const existingItem = currentCart.find(
           (item: CartItem) => item.product.product_id === product.product_id
         );
-        
+
         let updatedCart: CartItem[];
         if (existingItem) {
           updatedCart = currentCart.map((item: CartItem) =>

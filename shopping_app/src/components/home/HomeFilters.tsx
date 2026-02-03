@@ -17,8 +17,13 @@ const HomeFilters: React.FC<Props> = ({
   priceRange, setPriceRange,
   maxPrice
 }) => {
-  const [minText, setMinText] = useState(String(priceRange[0]));
-  const [maxText, setMaxText] = useState(String(priceRange[1]));
+  const [minText, setMinText] = useState(String(priceRange?.[0] ?? 0));
+  const [maxText, setMaxText] = useState(String(priceRange?.[1]?? maxPrice));
+
+  React.useEffect(() => {
+    setMinText(String(priceRange?.[0] ?? 0));
+    setMaxText(String(priceRange?.[1] ?? maxPrice));
+  }, [priceRange, maxPrice]);
 
   const applyMin = (text: string) => {
     const num = Number(text) || 0;
@@ -65,7 +70,7 @@ const HomeFilters: React.FC<Props> = ({
           </Form.Label>
         </div>
 
-        <div className="d-flex align-items-center gap-2 mb-2">
+        <div className="d-flex align-items-center gap-2">
           <Form.Control
             type="text"
             inputMode="numeric"
@@ -88,33 +93,6 @@ const HomeFilters: React.FC<Props> = ({
             className="text-center"
             size="sm"
             placeholder="עד מחיר"
-          />
-        </div>
-
-        <div>
-          <Form.Label className="text-muted small mb-0">ממחיר ₪{priceRange[0]}</Form.Label>
-          <Form.Range
-            min={0}
-            max={maxPrice}
-            value={priceRange[0]}
-            onChange={(e) => {
-              const val = Math.min(Number(e.target.value), priceRange[1]);
-              setPriceRange([val, priceRange[1]]);
-              setMinText(String(val));
-            }}
-          />
-        </div>
-        <div>
-          <Form.Label className="text-muted small mb-0">עד מחיר ₪{priceRange[1]}</Form.Label>
-          <Form.Range
-            min={0}
-            max={maxPrice}
-            value={priceRange[1]}
-            onChange={(e) => {
-              const val = Math.max(Number(e.target.value), priceRange[0]);
-              setPriceRange([priceRange[0], val]);
-              setMaxText(String(val));
-            }}
           />
         </div>
       </Col>

@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { FaShoppingCart, FaHome, FaClipboardList, FaUserShield } from 'react-icons/fa';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
-import UserMenu from '../UserMenu/UserMenu';
+import UserMenu from '../user-menu/UserMenu';
 
 const AppNavbar: React.FC = () => {
   const location = useLocation();

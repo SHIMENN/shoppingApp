@@ -39,7 +39,7 @@ export const useHome = (products: Product[], loadAll?: () => void) => {
     try {
       await addToCart(product);
       showToast(`${product.name} נוסף לעגלה בהצלחה! `, 'success');
-    } catch (error) {
+    } catch {
       showToast('שגיאה בהוספת המוצר ', 'danger');
     }
   };
@@ -49,7 +49,7 @@ export const useHome = (products: Product[], loadAll?: () => void) => {
     return products
       .filter((product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
         return matchesSearch && matchesPrice;
       })

@@ -21,7 +21,7 @@ export const useAdminOrders = () => {
       } else {
         setOrders([]);
       }
-    } catch (error) {
+    } catch {
       showToast('שגיאה בטעינת הזמנות', 'danger');
     } finally {
       setLoading(false);
@@ -34,7 +34,7 @@ export const useAdminOrders = () => {
       await updateOrderStatus(orderId, newStatus);
       showToast(`סטטוס הזמנה #${orderId} עודכן בהצלחה`, 'success');
       await loadOrders();
-    } catch (error) {
+    } catch {
       showToast('שגיאה בעדכון הסטטוס', 'danger');
     } finally {
       setUpdatingOrderId(null);
@@ -50,7 +50,7 @@ export const useAdminOrders = () => {
       await deleteOrderAdmin(orderId);
       showToast(`הזמנה #${orderId} נמחקה בהצלחה`, 'success');
       setOrders(prev => prev.filter(order => order.order_id !== orderId));
-    } catch (error) {
+    } catch {
       showToast('שגיאה במחיקת ההזמנה', 'danger');
     } finally {
       setDeletingOrderId(null);

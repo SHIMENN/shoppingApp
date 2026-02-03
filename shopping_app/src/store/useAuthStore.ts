@@ -20,23 +20,23 @@ export const useAuthStore = create<AuthState>()(
       setIsMenuOpen: (open: boolean) => set({ isMenuOpen: open }),
 
       setAuthData: (user, token) => {
-        set({ 
-          user, 
-          token, 
-          isAuthenticated: true, 
-          loading: false 
+        set({
+          user,
+          token,
+          isAuthenticated: true,
+          loading: false
         });
       },
 
       logout: () => {
-        set({ 
-          user: null, 
-          token: null, 
-          isAuthenticated: false, 
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
           loading: false,
           isMenuOpen: false // סגירת התפריט בזמן התנתקות
         });
-        localStorage.removeItem('auth-storage'); 
+        localStorage.removeItem('auth-storage');
         useCartStore.setState({ cart: [] });
       },
 
@@ -62,7 +62,7 @@ export const useAuthStore = create<AuthState>()(
           if (!wasAuthenticated) {
             await useCartStore.getState().syncCartWithServer();
           }
-        } catch (error) {
+        } catch {
           set({
             user: null,
             isAuthenticated: false,
@@ -76,10 +76,10 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       // חשוב: אנחנו מוסיפים רק את מה שצריך להישמר בריענון דף
       // ה-isMenuOpen נשאר בחוץ כדי שיתאפס ל-false בכל טעינה
-      partialize: (state) => ({ 
-        user: state.user, 
-        token: state.token, 
-        isAuthenticated: state.isAuthenticated 
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated
       }),
     }
   )

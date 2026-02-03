@@ -11,7 +11,7 @@ interface Props {
 }
 
 const CheckoutSummary: React.FC<Props> = ({ cart, subtotal, shippingCost, total }) => (
-  <Card className="shadow-sm border-0 sticky-top" style={{ top: '20px' }}>
+  <Card className="shadow-sm border-0 sticky-lg-top" style={{ top: '20px' }}>
     <Card.Header className="bg-white py-3 border-bottom">
       <h5 className="mb-0 fw-bold">סיכום הזמנה ({cart.length} פריטים)</h5>
     </Card.Header>

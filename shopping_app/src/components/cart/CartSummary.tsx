@@ -8,7 +8,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   onCheckout,
   isLoading,
 }) => (
-  <Card className="shadow-sm border-0 sticky-top" style={{ top: '100px' }}>
+  <Card className="shadow-sm border-0 sticky-lg-top" style={{ top: '100px' }}>
     <Card.Body className="p-4">
       <h5 className="fw-bold mb-4 border-bottom pb-3">סיכום הזמנה</h5>
 

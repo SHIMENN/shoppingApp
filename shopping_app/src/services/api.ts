@@ -1,14 +1,15 @@
-//חיבור לשרת רק עם עוגיות
+//חיבור לשרת עם עוגיות + טוקן
 import axios from 'axios';
 
 export const API_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
     baseURL: API_URL,
-    withCredentials: true, // זה החלק הקריטי עבור עוגיות!
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
     },
 });
 
-export default api;
+
+export default api

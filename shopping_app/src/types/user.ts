@@ -33,5 +33,23 @@ export interface AuthState {
   updateUser: (data: Partial<User>) => Promise<void>;
   checkAuth: () => Promise<void>;
   setIsMenuOpen: (open: boolean) => void;
+}
 
+export interface UserFormData {
+  user_name: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: 'user' | 'admin';
+}
+
+export interface UserState {
+  users: User[];
+  loading: boolean;
+  error: string | null;
+  actionLoading: boolean;
+  loadUsers: () => Promise<void>;
+  updateUser: (userId: number, data: Partial<UserFormData>) => Promise<void>;
+  deleteUser: (userId: number) => Promise<void>;
+  clearError: () => void;
 }

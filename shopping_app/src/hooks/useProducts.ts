@@ -18,7 +18,7 @@ export const useProducts = () => {
         const response = await fetchProducts(1, 20);
         setProducts(response.data);
         setHasMore(response.page < response.totalPages);
-      } catch (err) {
+      } catch {
         setError('שגיאה בטעינת המוצרים. נסה שוב מאוחר יותר.');
       } finally {
         setLoading(false);
@@ -44,7 +44,7 @@ export const useProducts = () => {
       const moreAvailable = nextPage < response.totalPages;
       setHasMore(moreAvailable);
       if (!moreAvailable) setAllLoaded(true);
-    } catch (err) {
+    } catch {
       setError('שגיאה בטעינת מוצרים נוספים');
     } finally {
       loadingRef.current = false;
@@ -74,7 +74,7 @@ export const useProducts = () => {
       pageRef.current = currentPage;
       setHasMore(false);
       setAllLoaded(true);
-    } catch (err) {
+    } catch {
       setError('שגיאה בטעינת מוצרים נוספים');
     } finally {
       loadingRef.current = false;

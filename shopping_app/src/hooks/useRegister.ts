@@ -6,11 +6,11 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
 
 export const useRegister = () => {
-  const [formData, setFormData] = useState({ 
-    username: '', 
-    email: '', 
-    password: '', 
-    confirmPassword: '' 
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -27,13 +27,13 @@ export const useRegister = () => {
     try {
       const response = await registerApi(formData.username, formData.email, formData.password);
       setAuthData(response.userData, response.access_token);
-      
+
       // סנכרון עגלה לאחר התחברות
       await useCartStore.getState().syncCartWithServer();
 
       alert('נרשמת והתחברת בהצלחה!');
       navigate('/');
-    } catch (err) {
+    } catch {
       alert('שגיאה בהרשמה. וודא שהפרטים תקינים או שהמשתמש לא קיים כבר.');
     }
   };

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 // Hooks
 import { useProducts } from '../hooks/useProducts';
 import { useHome } from '../hooks/useHome';
-import { useCartStore } from '../store/useCartStore';
+
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 
 // Components
@@ -19,22 +19,23 @@ import { type Product } from '../types/product';
 
 const Home: React.FC = () => {
   const { products, loading, loadingMore, error, hasMore, loadMore, loadAll } = useProducts();
-  const addToCartGlobal = useCartStore(state => state.addToCart);
+
   const navigate = useNavigate();
-  // הפעלת הגלילה האינסופית דרך ה-Hook המופרד
-  useInfiniteScroll(loadMore, hasMore, loadingMore);
   
+  // 1. קודם כל מפעילים את כל ה-Hooks
+  useInfiniteScroll(loadMore, hasMore, loadingMore);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  // הזזתי את זה לכאן - מעל ה-if
   const {
     searchTerm, setSearchTerm, sortBy, setSortBy,
     priceRange, setPriceRange, maxPrice, isPriceFiltered,
     filteredProducts, handleAddToCart, toasts, removeToast
   } = useHome(products || [], loadAll);
 
+  // 2. רק אחר כך עושים check ל-loading או error
   if (loading) return <ProductSkeleton count={8} />;
   if (error) return <Alert variant="danger" className="m-5 text-center">{error}</Alert>;
-
   return (
     <>
       <ToastNotification toasts={toasts} onClose={removeToast} />
@@ -85,17 +86,20 @@ const Home: React.FC = () => {
 
         <HomeInfoSection />
 
-      <Modal show={!!selectedProduct} onHide={() => setSelectedProduct(null)} size="lg" centered dir="rtl">
+      <Modal show={!!selectedProduct} onHide={() => setSelectedProduct(null)} size="lg" fullscreen="sm-down" centered dir="rtl">
         {selectedProduct && (
           <>
             <Modal.Header closeButton className="border-0 pb-0"></Modal.Header>
             <Modal.Body className="pt-0 px-4 pb-4">
               <Row className="align-items-center">
-                <Col md={6} className="text-center">
-                  <Image src={selectedProduct.image_url} fluid className="rounded-4 shadow-sm" />
+                <Col md={6} className="text-center mb-3 mb-md-0">
+                  <Image src={selectedProduct.image_url} fluid className="rounded-4 shadow-sm" style={{ maxHeight: '300px', objectFit: 'cover' }} />
                 </Col>
                 <Col md={6}>
                   <h2 className="fw-bold">{selectedProduct.name}</h2>
+                  {selectedProduct.description && (
+                    <p className="text-muted">{selectedProduct.description}</p>
+                  )}
                   <h3 className="text-danger fw-bold mb-4">₪{selectedProduct.price}</h3>
                   <div className="d-grid gap-3">
 
@@ -106,8 +110,8 @@ const Home: React.FC = () => {
                     }}>
                       <FaCreditCard className="me-2" /> הזמן עכשיו
                     </Button>
-                    <Button variant="outline-dark" size="lg" onClick={() => {
-                        addToCartGlobal(selectedProduct);
+                    <Button variant="outline-dark" size="lg" onClick={async () => {
+                        await handleAddToCart(selectedProduct);
                         setSelectedProduct(null);
                     }}>
                       <FaCartPlus className="me-2" /> הוספה לעגלה

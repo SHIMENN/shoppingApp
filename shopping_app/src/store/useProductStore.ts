@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { AxiosError } from 'axios';
 import { fetchProducts } from '../services/productService';
 import api from '../services/api';
 import { type ProductState } from '../types/product';
@@ -22,23 +23,24 @@ export const useProductStore = create<ProductState>((set, get) => ({
     try {
       // הקריאה ל-fetchProducts כעת מחזירה אובייקט עם data, total וכו'
       const response = await fetchProducts(page, limit);
-      
-      set({ 
+
+      set({
         products: response.data, // המערך נמצא בתוך תת-שדה data
         total: response.total,
         totalPages: response.totalPages,
         currentPage: response.page,
-        loading: false 
+        loading: false
       });
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as AxiosError;
       // טיפול בשגיאת Rate Limiting (429) כפי שנדרש בדוח האבטחה
-      const errorMessage = err.response?.status === 429 
-        ? 'יותר מדי בקשות. אנא המתן דקה ונסה שוב.' 
+      const errorMessage = err.response?.status === 429
+        ? 'יותר מדי בקשות. אנא המתן דקה ונסה שוב.'
         : 'נכשלה טעינת המוצרים';
-        
-      set({ 
-        error: errorMessage, 
-        loading: false 
+
+      set({
+        error: errorMessage,
+        loading: false
       });
     }
   },
@@ -48,17 +50,18 @@ export const useProductStore = create<ProductState>((set, get) => ({
     set({ actionLoading: true, error: null });
     try {
       const response = await api.post('/products', newProduct);
-      
+
       // השרת מחזיר את המוצר החדש עם שדה 'id'
-      set((state) => ({ 
+      set((state) => ({
         products: [...state.products, response.data],
         total: state.total + 1,
-        actionLoading: false 
+        actionLoading: false
       }));
-    } catch (err: any) {
-      set({ 
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      set({
         error: err.response?.data?.message || 'שגיאה בהוספת מוצר',
-        actionLoading: false 
+        actionLoading: false
       });
     }
   },
@@ -70,18 +73,18 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
     try {
       const response = await api.patch(`/products/${id}`, updatedProduct);
-      
+
       set((state) => ({
-        products: state.products.map(p => 
+        products: state.products.map(p =>
           p.product_id === id ? response.data : p
         ),
         actionLoading: false
       }));
-    } catch (err: any) {
-      set({ 
+    } catch {
+      set({
         products: previousProducts, // Rollback במקרה של שגיאה
         error: 'שגיאה בעדכון מוצר',
-        actionLoading: false 
+        actionLoading: false
       });
     }
   },
@@ -102,7 +105,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
         total: state.total - 1,
         actionLoading: false
       }));
-    } catch (err: any) {
+    } catch {
       set({
         products: previousProducts,
         error: 'שגיאה במחיקת מוצר',
@@ -120,7 +123,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
         deletedProducts: response.data.data,
         loading: false
       });
-    } catch (err: any) {
+    } catch {
       set({
         error: 'שגיאה בטעינת מוצרים מחוקים',
         loading: false
@@ -139,7 +142,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
       }));
       // רענון רשימת המוצרים הפעילים - טען את כולם
       get().loadProducts(1, 1000);
-    } catch (err: any) {
+    } catch {
       set({
         error: 'שגיאה בשחזור המוצר',
         actionLoading: false

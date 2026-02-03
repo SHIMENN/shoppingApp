@@ -4,9 +4,9 @@ import api from './api';
  * התחברות למערכת
  */
 export const loginApi = async (email: string, password: string) => {
-  const response = await api.post('/auth/login', { email, password });
-  // השרת מחזיר אובייקט עם { access_token, user }
-  return response.data; 
+  const response = await api.post('/auth/login-cookie', { email, password });
+  // השרת מגדיר עוגיית access_token ומחזיר { userData }
+  return response.data;
 };
 
 /**

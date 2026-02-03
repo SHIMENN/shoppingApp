@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense} from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import MainLayout from './layouts/MainLayout';
@@ -6,14 +6,14 @@ import { AdminRoute } from './components/routing';
 import FullPageLoader from './components/common/FullPageLoader';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
-import Login from './pages/LoginPage';
+import Login from './pages/Login';
 import Register from './pages/Register';
 import MyOrders from './pages/MyOrders';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminProducts from './pages/Admin/AdminProducts';
 import AdminOrders from './pages/Admin/AdminOrders';
-import Profile from './pages/ProfilePage';
-import CheckoutPage from './pages/CheckoutPage';
+import Profile from './pages/Profile';
+import CheckoutPage from './pages/Checkout';
 import AdminLayout from './layouts/AdminLayout';
 
 const App: React.FC = () => {
@@ -35,7 +35,7 @@ const App: React.FC = () => {
         <Routes>
           {/* שימוש ב-MainLayout כעטיפה לכל הנתיבים שצריכים Navbar */}
           <Route element={<MainLayout />}>
-            
+
             {/* נתיבים ציבוריים */}
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
@@ -50,12 +50,12 @@ const App: React.FC = () => {
 
           {/* נתיבים מוגנים למנהלי מערכת (Admin) עם Layout נפרד */}
           <Route element={<AdminRoute />}>
-          <Route element={<AdminLayout />}>
+            <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/products" element={<AdminProducts />} />
               <Route path="/admin/orders" element={<AdminOrders />} />
-              </Route>
             </Route>
+          </Route>
 
           {/* נתיב Catch-all למקרה של דף לא נמצא */}
           <Route path="*" element={

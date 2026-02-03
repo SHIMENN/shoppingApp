@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';
-import {type ShippingDetails } from '../types/cart';
+import { type ShippingDetails } from '../types/cart';
 
 export const useCheckout = () => {
   const navigate = useNavigate();
-  const { checkout, loading, getTotalPrice, cart } = useCartStore();
+  const { checkout, getTotalPrice, cart } = useCartStore();
+  const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,11 +34,16 @@ export const useCheckout = () => {
     }
 
     setError(null);
+    setLoading(true);
+
     try {
       await checkout(shippingDetails);
       navigate('/my-orders');
     } catch {
       setError('אירעה שגיאה בביצוע ההזמנה. אנא נסה שוב.');
+    } finally {
+      // התיקון הקריטי: שחרור הכפתור תמיד, גם אם נכשל
+      setLoading(false);
     }
   };
 
