@@ -144,6 +144,9 @@ export const useCartStore = create<CartState>()(
       checkout: async (shippingDetails: ShippingDetails) => {
         set({ loading: true, error: null });
         try {
+          // סנכרון העגלה עם השרת לפני ביצוע ההזמנה
+          await get().syncCartWithServer();
+
           // פורמט כתובת המשלוח כטקסט מלא
           const shipping_address = `${shippingDetails.fullName}, ${shippingDetails.address}, ${shippingDetails.city}${shippingDetails.postalCode ? ` ${shippingDetails.postalCode}` : ''}, טלפון: ${shippingDetails.phone}`;
 

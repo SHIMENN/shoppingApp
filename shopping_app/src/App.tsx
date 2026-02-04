@@ -2,7 +2,7 @@ import React, { useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import MainLayout from './layouts/MainLayout';
-import { AdminRoute } from './components/routing';
+import { AdminRoute, ProtectedRoute } from './components/routing';
 import FullPageLoader from './components/common/FullPageLoader';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
@@ -41,9 +41,13 @@ const App: React.FC = () => {
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/my-orders" element={<MyOrders />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
+
+            {/* נתיבים מוגנים - דורשים התחברות */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+            </Route>
 
 
           </Route>

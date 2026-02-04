@@ -120,9 +120,4 @@ export class ProductsService {
     product.isDeleted = false;
     return await this.productRepository.save(product);
   }
-
-  async createBulk(productsDto: CreateProductDto[]): Promise<Product[]> {
-    const newProducts = this.productRepository.create(productsDto);
-    return await this.productRepository.save(newProducts);
-  }
 }

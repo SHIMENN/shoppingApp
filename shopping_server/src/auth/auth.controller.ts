@@ -39,11 +39,11 @@ async loginWithCookie(
     @Request()req,
     @Res({passthrough: true}) response: Response,
 ){
-    const  {access_token, userData} = await this.authService.login(loginDto);
+    const  {access_token, userData} = await this.authService.login(req.user);
     response.cookie('access_token',access_token,{
         httpOnly: true,
         secure: process.env.NODE_ENV ===  'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 24, // 1 day
     });
     return{userData};
@@ -78,7 +78,7 @@ async loginWithCookie(
             'google',
             req.user,
         );
-        res.cookie('access_token', access_token, { httpOnly: true ,path: '/',});
+        res.cookie('access_token', access_token, { httpOnly: true, path: '/', sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 });
         res.redirect(`http://localhost:5173`);
     }
 }

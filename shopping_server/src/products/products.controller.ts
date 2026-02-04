@@ -104,8 +104,4 @@ export class ProductsController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.productsService.remove(id);
   }
-  @Post('bulk')
-async createBulk(@Body() products: CreateProductDto[]) {
-  return this.productsService.createBulk(products);
-}
 }
