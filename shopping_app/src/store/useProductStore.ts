@@ -8,11 +8,9 @@ import { type ProductState } from '../types/product';
 export const useProductStore = create<ProductState>((set, get) => ({
   products: [],
   deletedProducts: [],
-  // שדות חדשים עבור ה-Pagination (לפי דוח הביקורת)
   total: 0,
   totalPages: 0,
   currentPage: 1,
-
   loading: false,
   error: null,
   actionLoading: false,
@@ -33,7 +31,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
       });
     } catch (error) {
       const err = error as AxiosError;
-      // טיפול בשגיאת Rate Limiting (429) כפי שנדרש בדוח האבטחה
       const errorMessage = err.response?.status === 429
         ? 'יותר מדי בקשות. אנא המתן דקה ונסה שוב.'
         : 'נכשלה טעינת המוצרים';

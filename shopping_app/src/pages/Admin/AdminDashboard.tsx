@@ -12,18 +12,16 @@ const AdminDashboard: React.FC = () => {
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  
   const handleLogout = () => {
     if (window.confirm('האם אתה בטוח שברצונך להתנתק?')) {
       logout();
-      navigate('/login');
+      navigate('/');
     }
   };
 
   return (
     <Tab.Container id="admin-tabs" defaultActiveKey="products">
-      
-      {/* 1. תפריט למסכים קטנים (Mobile) */}
       <MobileSidebar 
         isOpen={sidebarOpen} 
         setIsOpen={setSidebarOpen} 
@@ -31,8 +29,6 @@ const AdminDashboard: React.FC = () => {
       />
 
       <Row className="g-0">
-        
-        {/* 2. סרגל צד למחשב (Desktop Sidebar) - מוסתר במובייל */}
         <Col md={3} lg={2} className="bg-white shadow-sm p-3 d-none d-md-flex flex-column sticky-top" style={{ height: '100vh', overflowY: 'auto' }}>
           <div className="text-center mb-4 pt-3">
             <h4 className="fw-bold text-danger">כל בו אקספרס</h4>

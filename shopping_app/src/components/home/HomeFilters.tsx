@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Form, InputGroup } from 'react-bootstrap';
+import { Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 
 interface Props {
   searchTerm: string;
@@ -18,12 +18,19 @@ const HomeFilters: React.FC<Props> = ({
   maxPrice
 }) => {
   const [minText, setMinText] = useState(String(priceRange?.[0] ?? 0));
-  const [maxText, setMaxText] = useState(String(priceRange?.[1]?? maxPrice));
+  const [maxText, setMaxText] = useState(String(priceRange?.[1] ?? maxPrice));
 
   React.useEffect(() => {
     setMinText(String(priceRange?.[0] ?? 0));
     setMaxText(String(priceRange?.[1] ?? maxPrice));
   }, [priceRange, maxPrice]);
+
+  // פונקציית ניקוי
+  const handleClear = () => {
+    setSearchTerm('');
+    setSortBy('default');
+    setPriceRange([0, maxPrice]);
+  };
 
   const applyMin = (text: string) => {
     const num = Number(text) || 0;
@@ -33,7 +40,7 @@ const HomeFilters: React.FC<Props> = ({
   };
 
   const applyMax = (text: string) => {
-    const num = Number(text) || 0;
+    const num = text === '' ? maxPrice : (Number(text) || 0);
     const clamped = Math.max(priceRange[0], Math.min(num, maxPrice));
     setPriceRange([priceRange[0], clamped]);
     setMaxText(String(clamped));
@@ -41,11 +48,12 @@ const HomeFilters: React.FC<Props> = ({
 
   return (
     <Row className="mb-4 align-items-end">
-      <Col md={4} className="mb-3">
+      {/* חיפוש */}
+      <Col md={3} className="mb-3">
         <InputGroup>
           <Form.Control
             type="text"
-            placeholder="חפש מוצר לפי שם או תיאור..."
+            placeholder="חפש מוצר..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="text-end"
@@ -54,7 +62,8 @@ const HomeFilters: React.FC<Props> = ({
         </InputGroup>
       </Col>
 
-      <Col md={3} className="mb-3">
+      {/* מיון */}
+      <Col md={2} className="mb-3">
         <Form.Select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="text-end">
           <option value="default">סדר ברירת מחדל</option>
           <option value="name">מיין לפי שם</option>
@@ -63,13 +72,13 @@ const HomeFilters: React.FC<Props> = ({
         </Form.Select>
       </Col>
 
+      {/* טווח מחירים */}
       <Col md={5} className="mb-3">
         <div className="text-end mb-2">
           <Form.Label className="fw-bold small mb-0">
-            טווח מחיר: ₪{priceRange[0]} – ₪{priceRange[1]}
+            מחיר: ₪{priceRange[0]} – ₪{priceRange[1]}
           </Form.Label>
         </div>
-
         <div className="d-flex align-items-center gap-2">
           <Form.Control
             type="text"
@@ -95,6 +104,13 @@ const HomeFilters: React.FC<Props> = ({
             placeholder="עד מחיר"
           />
         </div>
+      </Col>
+
+      {/* כפתור ניקוי */}
+      <Col md={2} className="mb-3 text-start">
+        <Button variant="outline-danger" size="sm" onClick={handleClear} className="w-100">
+          ניקוי סינונים
+        </Button>
       </Col>
     </Row>
   );

@@ -4,10 +4,14 @@ import { type CartState, type CartItem, type ShippingDetails } from '../types/ca
 import { type Product } from '../types/product';
 import api from '../services/api';
 import { useAuthStore } from './useAuthStore';
+import { createBuyNowSlice } from './createBuyNowSlice';
+
+// נעילה למניעת סנכרון כפול (React strict mode מריץ useEffect פעמיים)
+let syncInProgress = false;
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set, get) => ({
+    (set, get, storeApi) => ({
       cart: [],
       loading: false,
       error: null,
@@ -103,18 +107,38 @@ export const useCartStore = create<CartState>()(
 
       // סנכרון מול השרת (אחרי לוגין)
       syncCartWithServer: async () => {
-        const localCart = get().cart;
-        if (localCart.length === 0) return get().fetchCart();
+        if (syncInProgress) return;
+        syncInProgress = true;
         try {
+          const localCart = get().cart;
+          if (localCart.length === 0) return get().fetchCart();
+
+          // קודם בודקים מה כבר קיים בשרת
+          const serverResponse = await api.get('/cart');
+          const serverItems = serverResponse.data.cartItems || [];
+
+          // רק פריטים שלא קיימים בשרת יישלחו
           for (const item of localCart) {
-            await api.post('/cart', {
-              productId: item.product?.product_id || item.product_id,
-              quantity: item.quantity,
-            });
+            const productId = item.product?.product_id || item.product_id;
+            const existsOnServer = serverItems.some(
+              (serverItem: CartItem) => {
+                const serverId = serverItem.product?.product_id || serverItem.product_id;
+                const localId = item.product?.product_id || item.product_id;
+                return String(serverId) === String(localId);
+              }
+            );
+            if (!existsOnServer) {
+              await api.post('/cart', {
+                productId,
+                quantity: item.quantity,
+              });
+            }
           }
           await get().fetchCart();
         } catch (error) {
           console.error('Error syncing cart', error);
+        } finally {
+          syncInProgress = false;
         }
       },
 
@@ -140,14 +164,15 @@ export const useCartStore = create<CartState>()(
           0
         ),
 
-      // ביצוע הזמנה סופי
+      ...createBuyNowSlice(set, get, storeApi),
+
       checkout: async (shippingDetails: ShippingDetails) => {
         set({ loading: true, error: null });
+        const { isBuyNowMode, savedCart } = get();
+
         try {
-          // סנכרון העגלה עם השרת לפני ביצוע ההזמנה
           await get().syncCartWithServer();
 
-          // פורמט כתובת המשלוח כטקסט מלא
           const shipping_address = `${shippingDetails.fullName}, ${shippingDetails.address}, ${shippingDetails.city}${shippingDetails.postalCode ? ` ${shippingDetails.postalCode}` : ''}, טלפון: ${shippingDetails.phone}`;
 
           const response = await api.post('/orders/checkout', {
@@ -155,7 +180,30 @@ export const useCartStore = create<CartState>()(
             notes: shippingDetails.notes || undefined
           });
 
-          set({ cart: [], loading: false });
+          // הצלחה!
+
+          if (isBuyNowMode) {
+            // במצב קנייה מיידית: משחזרים את העגלה המקורית כאילו לא קרה כלום (כי הפריטים המקוריים לא נקנו)
+            const { isAuthenticated } = useAuthStore.getState();
+
+            set({
+              cart: savedCart,
+              savedCart: [],
+              isBuyNowMode: false,
+              loading: false
+            });
+
+            if (isAuthenticated) {
+              // שחזור הנתונים בשרת
+              // הערה: ה-checkout בשרת כבר מנקה את העגלה, אז אנחנו רק צריכים לדחוף חזרה את savedCart
+              // אבל syncCartWithServer מצפה שיש משהו בלוקלי ואין בשרת, אז זה אמור לעבוד
+              get().syncCartWithServer();
+            }
+          } else {
+            // במצב רגיל: מרוקנים את העגלה
+            set({ cart: [], loading: false });
+          }
+
           return response.data;
         } catch (e) {
           set({ loading: false, error: 'נכשלה ביצוע ההזמנה' });
@@ -163,6 +211,14 @@ export const useCartStore = create<CartState>()(
         }
       },
     }),
-    { name: 'cart-storage' }
+    {
+      name: 'cart-storage',
+      // לא שומרים את מצב BuyNow ב-persist כדי למנוע מצב תקוע בריענון
+      partialize: (state) => ({
+        cart: state.isBuyNowMode ? state.savedCart : state.cart, // תמיד שומרים לדיסק את העגלה האמיתית!
+        // אם אנחנו במצב BuyNow, ה-cart מכיל רק פריט אחד זמני, ואנחנו לא רוצים לדרוס את האחסון המקומי איתו.
+        // אז אנחנו שומרים את savedCart (שהוא העגלה המקורית).
+      }),
+    }
   )
 );

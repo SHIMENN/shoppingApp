@@ -25,3 +25,13 @@ export const updateUser = async (userId: number, data: {
 export const deleteUser = async (userId: number): Promise<void> => {
   await api.delete(`/users/${userId}`);
 };
+
+export const getAllUsersWithDeleted = async (): Promise<User[]> => {
+  const response = await api.get('/users/with-deleted');
+  return response.data;
+};
+
+export const restoreUser = async (userId: number): Promise<User> => {
+  const response = await api.patch(`/users/${userId}/restore`);
+  return response.data;
+};

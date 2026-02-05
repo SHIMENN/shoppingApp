@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useUserStore } from '../../store/useUserStore';
+import { AxiosError } from 'axios';
 import { useToast } from '../useToast';
 import { type User, type UserFormData } from '../../types/user';
 
 export const useAdminUsers = () => {
-  const { users, loading, loadUsers, updateUser, deleteUser } = useUserStore();
+  const { users, loading, loadUsers, updateUser, deleteUser, restoreUser } = useUserStore();
   const { toasts, showToast, removeToast } = useToast();
 
   const [showModal, setShowModal] = useState(false);
@@ -18,10 +19,11 @@ export const useAdminUsers = () => {
   });
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleted, setShowDeleted] = useState(false);
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    loadUsers(showDeleted);
+  }, [showDeleted]);
 
   const handleOpenModal = (user: User) => {
     setEditingUser(user);
@@ -51,8 +53,30 @@ export const useAdminUsers = () => {
       try {
         await deleteUser(userId);
         showToast('המשתמש נמחק בהצלחה', 'success');
+      } catch (error) {
+        // בודקים אם השגיאה קשורה לאילוצי מפתח זר (הזמנות קיימות)
+        const err = error as AxiosError<{ message: string; error?: string }>;
+        const serverMessage = err.response?.data?.message || err.response?.data?.error || '';
+
+        let displayMessage = 'שגיאה במחיקת המשתמש';
+        if (serverMessage.toLowerCase().includes('foreign key') || serverMessage.toLowerCase().includes('order')) {
+          displayMessage = 'לא ניתן למחוק משתמש זה (יש לו הזמנות או נתונים מקושרים)';
+        } else if (serverMessage) {
+          displayMessage = `שגיאה במחיקת המשתמש`;
+        }
+
+        showToast(displayMessage, 'danger');
+      }
+    }
+  };
+
+  const handleRestore = async (userId: number) => {
+    if (window.confirm('האם אתה בטוח שברצונך לשחזר משתמש זה?')) {
+      try {
+        await restoreUser(userId);
+        showToast('המשתמש שוחזר בהצלחה', 'success');
       } catch {
-        showToast('שגיאה במחיקת המשתמש', 'danger');
+        showToast('שגיאה בשחזור המשתמש', 'danger');
       }
     }
   };
@@ -85,9 +109,12 @@ export const useAdminUsers = () => {
     setFormData,
     searchTerm,
     setSearchTerm,
+    showDeleted,
+    setShowDeleted,
     handleOpenModal,
     handleSubmit,
     handleDelete,
+    handleRestore,
     loadUsers,
     totalUsers,
     adminCount,

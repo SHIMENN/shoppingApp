@@ -47,9 +47,15 @@ export interface CartState {
   clearCart: () => Promise<void>;
   getTotalItems: () => number;
   getTotalPrice: () => number;
-  
+
   // 2. עדכון חתימת הפונקציה לקבלת פרטי המשלוח
-  checkout: (shippingDetails: ShippingDetails) => Promise<void>; 
-  
+  checkout: (shippingDetails: ShippingDetails) => Promise<void>;
+
   syncCartWithServer: () => Promise<void>;
+
+  // Buy Now Mode
+  isBuyNowMode: boolean;
+  savedCart: CartItem[];
+  startBuyNow: (product: Product) => Promise<void>;
+  cancelBuyNow: () => Promise<void>;
 }

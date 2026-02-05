@@ -5,7 +5,7 @@ import { type ShippingDetails } from '../types/cart';
 
 export const useCheckout = () => {
   const navigate = useNavigate();
-  const { checkout, getTotalPrice, cart } = useCartStore();
+  const { checkout, getTotalPrice, cart, isBuyNowMode, cancelBuyNow } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [validated, setValidated] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +50,8 @@ export const useCheckout = () => {
   return {
     cart, loading, error, setError, validated, shippingDetails,
     subtotal, shippingCost, total,
-    handleChange, handleSubmit, navigate
+    handleChange, handleSubmit, navigate,
+    // Buy Now props
+    isBuyNowMode, cancelBuyNow
   };
 };

@@ -67,9 +67,11 @@ const AdminOrderItem: React.FC<Props> = ({ order, index, updatingOrderId, deleti
                 <option value="delivered">נמסר</option>
                 <option value="cancelled">בוטל</option>
               </Form.Select>
-              <Button variant="outline-danger" size="sm" className="w-100 mt-3" onClick={() => onDelete(order.order_id)} disabled={deletingOrderId === order.order_id}>
-                <FaTrash className="me-1" /> מחק הזמנה
-              </Button>
+              {order.status === 'cancelled' && (
+                <Button variant="outline-danger" size="sm" className="w-100 mt-3" onClick={() => onDelete(order.order_id)} disabled={deletingOrderId === order.order_id}>
+                  <FaTrash className="me-1" /> מחק הזמנה
+                </Button>
+              )}
             </Card>
           </Col>
           <Col md={6}>

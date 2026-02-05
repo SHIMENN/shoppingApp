@@ -25,11 +25,7 @@ const AdminOrders: React.FC = () => {
     <>
       <ToastNotification toasts={toasts} onClose={removeToast} />
 
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2 className="fw-bold mb-1">ניהול הזמנות</h2>
-          <p className="text-muted mb-0">צפייה ועדכון סטטוס הזמנות</p>
-        </div>
+      <div className="d-flex justify-content-end mb-4">
         <Button variant="outline-primary" size="sm" onClick={loadOrders}><FaRedo className="me-1" /> רענן</Button>
       </div>
 

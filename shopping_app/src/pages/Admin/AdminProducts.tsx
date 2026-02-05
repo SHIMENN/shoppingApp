@@ -49,7 +49,6 @@ const AdminProducts: React.FC = () => {
         >
           <FaPlus className="me-2" /> הוסף מוצר חדש
         </Button>
-        <h4 className="fw-bold mb-0 text-secondary d-none d-md-block">ניהול מלאי</h4>
       </div>
 
       <Tabs 

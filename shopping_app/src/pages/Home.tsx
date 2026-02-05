@@ -21,7 +21,7 @@ const Home: React.FC = () => {
   const { products, loading, loadingMore, error, hasMore, loadMore, loadAll } = useProducts();
 
   const navigate = useNavigate();
-  
+
   // 1. קודם כל מפעילים את כל ה-Hooks
   useInfiniteScroll(loadMore, hasMore, loadingMore);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -41,50 +41,50 @@ const Home: React.FC = () => {
       <ToastNotification toasts={toasts} onClose={removeToast} />
 
       {/* כותרת האתר */}
-        <div className="text-center mb-5">
-          <h1 className="display-4 fw-bold mb-2 text-danger">כל בו אקספרס</h1>
-          <p className="text-muted fs-5">איכות, שירות ומחיר במקום אחד</p>
+      <div className="text-center mb-5">
+        <h1 className="display-4 fw-bold mb-2 text-danger">כל בו אקספרס</h1>
+        <p className="text-muted fs-5">איכות, שירות ומחיר במקום אחד</p>
+      </div>
+
+      {/* פילטרים */}
+      <HomeFilters
+        searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+        sortBy={sortBy} setSortBy={setSortBy}
+        priceRange={priceRange} setPriceRange={setPriceRange}
+        maxPrice={maxPrice}
+      />
+
+      {(searchTerm || isPriceFiltered) && (
+        <div className="mb-3 text-end">
+          <Badge bg="primary" className="py-2 px-3">
+            {filteredProducts.length} מוצרים נמצאו
+          </Badge>
         </div>
+      )}
 
-        {/* פילטרים */}
-        <HomeFilters
-          searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-          sortBy={sortBy} setSortBy={setSortBy}
-          priceRange={priceRange} setPriceRange={setPriceRange}
-          maxPrice={maxPrice}
-        />
+      {/* גריד המוצרים */}
+      {filteredProducts.length === 0 ? (
+        <Alert variant="warning" className="text-center py-5">
+          <h5>לא נמצאו מוצרים תואמים לחיפוש</h5>
+        </Alert>
+      ) : (
+        <Row xs={1} md={2} lg={3} xl={4} className="g-4">
+          {filteredProducts.map((product) => (
+            <Col key={product.product_id}>
+              <ProductCard product={product} onClick={(p) => setSelectedProduct(p)} />
+            </Col>
+          ))}
+        </Row>
+      )}
 
-        {(searchTerm || isPriceFiltered) && (
-          <div className="mb-3 text-end">
-            <Badge bg="primary" className="py-2 px-3">
-              {filteredProducts.length} מוצרים נמצאו
-            </Badge>
-          </div>
-        )}
+      {/* מחוון טעינה נוספת */}
+      {loadingMore && (
+        <div className="py-4 text-center">
+          <Spinner animation="border" variant="primary" />
+        </div>
+      )}
 
-        {/* גריד המוצרים */}
-        {filteredProducts.length === 0 ? (
-          <Alert variant="warning" className="text-center py-5">
-            <h5>לא נמצאו מוצרים תואמים לחיפוש</h5>
-          </Alert>
-        ) : (
-          <Row xs={1} md={2} lg={3} xl={4} className="g-4">
-            {filteredProducts.map((product) => (
-              <Col key={product.product_id}>
-                <ProductCard product={product} onClick={(p) => setSelectedProduct(p)} />
-              </Col>
-            ))}
-          </Row>
-        )}
-        
-        {/* מחוון טעינה נוספת */}
-        {loadingMore && (
-          <div className="py-4 text-center">
-            <Spinner animation="border" variant="primary" />
-          </div>
-        )}
-
-        <HomeInfoSection />
+      <HomeInfoSection />
 
       <Modal show={!!selectedProduct} onHide={() => setSelectedProduct(null)} size="lg" fullscreen="sm-down" centered dir="rtl">
         {selectedProduct && (
@@ -104,15 +104,17 @@ const Home: React.FC = () => {
                   <div className="d-grid gap-3">
 
                     {/*כפתור הזמנה*/}
-                    <Button variant="danger" size="lg" onClick={() => {
-                        handleAddToCart(selectedProduct);
-                        navigate('/checkout');
+                    <Button variant="danger" size="lg" onClick={async () => {
+                      // שימוש בפונקציה החדשת לקנייה מיידית
+                      const { startBuyNow } = await import('../store/useCartStore').then(m => m.useCartStore.getState());
+                      await startBuyNow(selectedProduct);
+                      navigate('/checkout');
                     }}>
                       <FaCreditCard className="me-2" /> הזמן עכשיו
                     </Button>
                     <Button variant="outline-dark" size="lg" onClick={async () => {
-                        await handleAddToCart(selectedProduct);
-                        setSelectedProduct(null);
+                      await handleAddToCart(selectedProduct);
+                      setSelectedProduct(null);
                     }}>
                       <FaCartPlus className="me-2" /> הוספה לעגלה
                     </Button>

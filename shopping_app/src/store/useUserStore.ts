@@ -9,10 +9,12 @@ export const useUserStore = create<UserState>((set, get) => ({
   error: null,
   actionLoading: false,
 
-  loadUsers: async () => {
+  loadUsers: async (includeDeleted = false) => {
     set({ loading: true, error: null });
     try {
-      const users = await userService.getAllUsers();
+      const users = includeDeleted
+        ? await userService.getAllUsersWithDeleted()
+        : await userService.getAllUsers();
       set({ users, loading: false });
     } catch (error) {
       const err = error as AxiosError;
@@ -63,6 +65,26 @@ export const useUserStore = create<UserState>((set, get) => ({
         actionLoading: false,
       });
       throw error;
+    }
+  },
+
+  restoreUser: async (userId) => {
+    set({ actionLoading: true, error: null });
+    try {
+      const restoredUser = await userService.restoreUser(userId);
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.user_id === userId ? { ...u, ...restoredUser } : u
+        ),
+        actionLoading: false,
+      }));
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      set({
+        error: err.response?.data?.message || 'שגיאה בשחזור משתמש',
+        actionLoading: false,
+      });
+      throw err;
     }
   },
 
