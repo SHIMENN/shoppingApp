@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # בסיס הנתונים - PostgreSQL
   db:
     image: postgres:15-alpine
     container_name: shopping-db
@@ -15,7 +14,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # צד השרת - Node.js
   backend:
     build: ./shopping_server
     container_name: backend
@@ -24,25 +22,28 @@ services:
     env_file:
       - ./shopping_server/.env
     environment:
-      - FRONTEND_URL=http://localhost:5173
       - DB_HOST=db
       - DB_PORT=5432
+      - FRONTEND_URL=http://161.97.66.168:5173 # מומלץ לעדכן גם כאן
     depends_on:
-      - db # אומר לדוקר להפעיל את בסיס הנתונים לפני השרת
+      - db
     restart: always
 
-  # צד הלקוח - React
   frontend:
-    build: ./shopping_app
+    build:
+      context: ./shopping_app
+      args:
+        # כאן קורה הקסם: זה מעביר את ה-IP לתוך תהליך הבנייה
+        - VITE_API_URL=http://161.97.66.168:3000 
     container_name: shopping-frontend
     ports:
       - "5173:5173"
+    # משאירים גם כאן ליתר ביטחון
     environment:
-      - VITE_API_URL=http://localhost:3000
+      - VITE_API_URL=http://161.97.66.168:3000
     depends_on:
       - backend
     restart: always
 
-# הגדרה לשמירת הנתונים של ה-DB גם כשהקונטיינר נעצר
 volumes:
   postgres_data:

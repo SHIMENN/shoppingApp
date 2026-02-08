@@ -20,7 +20,8 @@ async function bootstrap() {
     origin:[
       process.env.FRONTEND_URL,
     'http://192.168.1.34:5173',
-   'http://10.56.245.65:5173'],
+   'http://10.56.245.65:5173',
+    'http://168.97.66.168:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true, //  ל בושח-Cookies!
   });
