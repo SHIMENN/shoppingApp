@@ -21,6 +21,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('with-deleted')
+  @UseGuards(AdminGuard)
+  findAllWithDeleted() {
+    return this.usersService.findAllWithDeleted();
+  }
+
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.usersService.findById(+id);
@@ -33,6 +39,12 @@ export class UsersController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Patch(':id/restore')
+  @UseGuards(AdminGuard)
+  restore(@Param('id') id: string) {
+    return this.usersService.restore(+id);
   }
 
   @Delete(':id')

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # בסיס הנתונים - PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: shopping-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 148779500
+      POSTGRES_DB: shopping_app
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # צד השרת - Node.js
+  backend:
+    build: ./shopping_server
+    container_name: backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./shopping_server/.env
+    environment:
+      - FRONTEND_URL=http://localhost:5173
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db # אומר לדוקר להפעיל את בסיס הנתונים לפני השרת
+    restart: always
+
+  # צד הלקוח - React
+  frontend:
+    build: ./shopping_app
+    container_name: shopping-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+    restart: always
+
+# הגדרה לשמירת הנתונים של ה-DB גם כשהקונטיינר נעצר
+volumes:
+  postgres_data:

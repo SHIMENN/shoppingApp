@@ -30,12 +30,9 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      {/* Suspense מציג לואדר בזמן שהדפים ב-Lazy Loading נטענים */}
       <Suspense fallback={<FullPageLoader />}>
         <Routes>
-          {/* שימוש ב-MainLayout כעטיפה לכל הנתיבים שצריכים Navbar */}
           <Route element={<MainLayout />}>
-
             {/* נתיבים ציבוריים */}
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
@@ -51,7 +48,6 @@ const App: React.FC = () => {
 
 
           </Route>
-
           {/* נתיבים מוגנים למנהלי מערכת (Admin) עם Layout נפרד */}
           <Route element={<AdminRoute />}>
             <Route element={<AdminLayout />}>

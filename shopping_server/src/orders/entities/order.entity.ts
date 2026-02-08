@@ -1,4 +1,4 @@
-import {Entity,PrimaryGeneratedColumn,Column,ManyToOne,OneToMany,CreateDateColumn,JoinColumn,} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, JoinColumn, } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { OrderItem } from '../../order-item/entities/order-item.entity';
 import { OrderStatus } from '../../orders/enums/order.enum';
@@ -16,7 +16,7 @@ export class Order {
   @Column('decimal', { precision: 10, scale: 2 })
   total_amount: number;
 
-  @Column({type: 'enum',enum: OrderStatus,default: OrderStatus.PENDING,})
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING, })
   status: OrderStatus;
 
   @Column({ nullable: true })
@@ -28,7 +28,7 @@ export class Order {
   @Column({ name: 'user_id', nullable: true })
   user_id: number;
 
-  @ManyToOne(() => User, (user) => user.orders, { eager: false })
+  @ManyToOne(() => User, (user) => user.orders, { eager: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
