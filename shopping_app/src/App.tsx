@@ -15,6 +15,9 @@ import AdminOrders from './pages/Admin/AdminOrders';
 import Profile from './pages/Profile';
 import CheckoutPage from './pages/Checkout';
 import AdminLayout from './layouts/AdminLayout';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 
 const App: React.FC = () => {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -38,6 +41,9 @@ const App: React.FC = () => {
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
 
             {/* נתיבים מוגנים - דורשים התחברות */}
             <Route element={<ProtectedRoute />}>

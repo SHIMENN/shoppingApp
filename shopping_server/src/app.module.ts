@@ -19,6 +19,7 @@ import { OrderItem } from './order-item/entities/order-item.entity';
 import { CloudinaryModule } from './products/cloudinary/cloudinary.module';  
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { EmailModule } from './email/email.module';
 
 
 @Module({
@@ -56,7 +57,7 @@ import { APP_GUARD } from '@nestjs/core';
       OrderItemModule,
        CartItemModule, 
        AuthModule, 
-       CloudinaryModule],
+       CloudinaryModule, EmailModule],
 
        
   controllers: [AppController],

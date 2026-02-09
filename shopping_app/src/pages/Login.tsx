@@ -46,6 +46,12 @@ const LoginPage: React.FC = () => {
             </InputGroup>
           </Form.Group>
 
+          <div className="text-end mb-3">
+            <Link to="/forgot-password" className="text-decoration-none small">
+              שכחת סיסמה?
+            </Link>
+          </div>
+
           <Button variant="primary" type="submit" className="w-100" disabled={loading}>
             {loading ? 'מתחבר...' : 'התחבר'}
           </Button>

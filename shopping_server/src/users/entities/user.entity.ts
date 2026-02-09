@@ -54,5 +54,26 @@ export class User {
 
     @DeleteDateColumn()
     deleted_at: Date;
+
+    // שדות אימות אימייל
+    @Column({ default: false })
+    isEmailVerified: boolean;
+
+    @Column({ type: 'varchar', nullable: true })
+    emailVerificationToken: string | null;
+
+    @Column({ type: 'timestamp', nullable: true })
+    emailVerificationExpires: Date | null;
+
+    // שדות איפוס סיסמה
+    @Column({ type: 'varchar', nullable: true })
+    passwordResetToken: string | null;
+
+    @Column({ type: 'timestamp', nullable: true })
+    passwordResetExpires: Date | null;
+
+
+
+
 }
 

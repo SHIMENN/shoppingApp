@@ -1,4 +1,4 @@
-import {Controller, Post, Body, UseGuards, Request,Get,Res,HttpCode,HttpStatus,} from '@nestjs/common';
+import {Controller, Post, Body, UseGuards, Request,Get,Res,HttpCode,HttpStatus,Query} from '@nestjs/common';
 import {type Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
@@ -81,4 +81,32 @@ async loginWithCookie(
         res.cookie('access_token', access_token, { httpOnly: true, path: '/', sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 });
         res.redirect(`http://localhost:5173`);
     }
+      // 👇 בקשה לאיפוס סיסמה
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    return this.authService.forgotPassword(email);
+  }
+
+  // 👇 איפוס סיסמה עם טוקן
+  @Post('reset-password')
+  async resetPassword(
+    @Body('token') token: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    return this.authService.resetPassword(token, newPassword);
+  }
+
+  // 👇 אימות אימייל
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
+  // 👇 שליחת אימייל אימות מחדש
+  @Post('resend-verification')
+  async resendVerificationEmail(@Body('email') email: string) {
+    return this.authService.resendVerificationEmail(email);
+  }
 }
+
+

@@ -31,7 +31,7 @@ export const useRegister = () => {
       // סנכרון עגלה לאחר התחברות
       await useCartStore.getState().syncCartWithServer();
 
-      alert('נרשמת והתחברת בהצלחה!');
+      alert('נרשמת בהצלחה! 📧\n\nנשלח אימייל אימות לכתובת המייל שלך.\nאנא בדוק את תיבת הדואר שלך (כולל תיקיית ספאם) ולחץ על קישור האימות.');
       navigate('/');
     } catch {
       alert('שגיאה בהרשמה. וודא שהפרטים תקינים או שהמשתמש לא קיים כבר.');

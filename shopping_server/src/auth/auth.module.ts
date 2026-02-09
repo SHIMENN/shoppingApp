@@ -7,12 +7,21 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { LocalAuthStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import {AdminGuard} from './guards/admin.guard';
+import { AdminGuard } from './guards/admin.guard';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { EmailModule } from 'src/email/email.module';
+import { PasswordResetService } from './password-reset.service';
+import { EmailVerificationService } from './email-verification.service';
+
 
 @Module({
     imports: [
+      TypeOrmModule.forFeature([User]),
+      ConfigModule,
       UsersModule,
+      EmailModule,
       PassportModule,
       JwtModule.registerAsync({
         imports: [ConfigModule],
@@ -26,11 +35,15 @@ import { GoogleStrategy } from './strategies/google.strategy';
       }),
     ],
     controllers: [AuthController],
-    providers: [AuthService,
-      JwtStrategy, 
+    providers: [
+      AuthService,
+      PasswordResetService,
+      EmailVerificationService,
+      JwtStrategy,
       GoogleStrategy,
       LocalAuthStrategy,
-      AdminGuard],
+      AdminGuard
+    ],
     exports: [AuthService],
 })
 export class AuthModule {}

@@ -45,3 +45,35 @@ export const updateUserApi = async (userId: number, data: {
   const response = await api.patch(`/users/${userId}`, data);
   return response.data;
 };
+
+/**
+ * בקשה לאיפוס סיסמה - שליחת אימייל עם קישור
+ */
+export const forgotPasswordApi = async (email: string) => {
+  const response = await api.post('/auth/forgot-password', { email });
+  return response.data;
+};
+
+/**
+ * איפוס סיסמה עם טוקן
+ */
+export const resetPasswordApi = async (token: string, newPassword: string) => {
+  const response = await api.post('/auth/reset-password', { token, newPassword });
+  return response.data;
+};
+
+/**
+ * אימות אימייל עם טוקן
+ */
+export const verifyEmailApi = async (token: string) => {
+  const response = await api.get(`/auth/verify-email?token=${token}`);
+  return response.data;
+};
+
+/**
+ * שליחת אימייל אימות מחדש
+ */
+export const resendVerificationEmailApi = async (email: string) => {
+  const response = await api.post('/auth/resend-verification', { email });
+  return response.data;
+};

@@ -1,15 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
-import { RegisterDto } from './dto/auth.dto'; 
+import { RegisterDto } from './dto/auth.dto';
 import { UserRole } from 'src/users/enums/roles.enum';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { Repository } from 'typeorm';
+import { PasswordResetService } from './password-reset.service';
+import { EmailVerificationService } from './email-verification.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private usersService: UsersService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
+        private passwordResetService: PasswordResetService,
+        private emailVerificationService: EmailVerificationService,
     ) {}
 
     async validateUser(email: string, password: string): Promise<any> {
@@ -55,6 +64,14 @@ export class AuthService {
             role: UserRole.USER,
         };
         const user = await this.usersService.create(userToCreate);
+
+        // שליחת אימייל אימות (לא חוסם את תהליך ההרשמה)
+        try {
+            await this.emailVerificationService.sendVerificationEmail(user.user_id, user.email);
+        } catch (error) {
+            console.error('Failed to send verification email during registration:', error.message);
+        }
+
         const { password: _, ...result } = user;
         return this.login(result);
     }
@@ -63,4 +80,25 @@ export class AuthService {
         const user = await this.usersService.findOrCreateOAuthUser(email, provider, profile);
         return this.login(user);
     }
+
+    // בקשה לאיפוס סיסמה
+    async forgotPassword(email: string) {
+        return this.passwordResetService.requestPasswordReset(email);
+    }
+
+    // איפוס הסיסמה בפועל
+    async resetPassword(token: string, newPassword: string) {
+        return this.passwordResetService.resetPassword(token, newPassword);
+    }
+
+    // אימות אימייל
+    async verifyEmail(token: string) {
+        return this.emailVerificationService.verifyEmail(token);
+    }
+
+    // שליחת אימייל אימות מחדש
+    async resendVerificationEmail(email: string) {
+        return this.emailVerificationService.resendVerificationEmail(email);
+    }
 }
+
