@@ -54,7 +54,7 @@ export const useLogin = () => {
         await useCartStore.getState().syncCartWithServer();
       } catch (syncError) {
         // לוג השגיאה אבל לא לחסום את המשתמש
-        console.error('אימייל או סיסמא לא תקינים', syncError);
+        console.error('Failed to sync cart:', syncError);
       }
 
       // ניקוי הטופס
@@ -64,15 +64,29 @@ export const useLogin = () => {
       // מעבר לדף הבית
       navigate('/');
       
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          'שגיאה בהתחברות. אנא נסה שנית.';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+// בתוך ה-catch של handleLogin
+} catch (err: any) {
+  let errorMessage = 'חלה שגיאה בתקשורת עם השרת';
+  
+  if (err.response) {
+    // שגיאות שהגיעו מהשרת (סטטוס 400, 401 וכו')
+    switch (err.response.status) {
+      case 401:
+        errorMessage = 'האימייל או הסיסמה אינם נכונים';
+        break;
+      case 403:
+        errorMessage = 'החשבון חסום או שטרם אומת';
+        break;
+      case 429:
+        errorMessage = 'יותר מדי ניסיונות. נסה שוב מאוחר יותר';
+        break;
+      default:
+        errorMessage = err.response.data?.message || 'שגיאה בהתחברות';
     }
-  };
+  }
+  setError(errorMessage);
+}
+}
 
   const handleGoogleLogin = useCallback(() => {
     // העברת השליטה לשרת
