@@ -33,15 +33,22 @@ export class PasswordResetService {
 
     await this.userRepository.save(user);
 
-    // שליחת אימייל - אם נכשל, רק נרשום בלוג אבל לא נזרוק שגיאה
+    // שליחת אימייל
     try {
       await this.emailService.sendPasswordResetEmail(email, resetToken);
+      console.log(`Password reset email sent successfully to: ${email}`);
     } catch (error) {
-      console.error('Failed to send password reset email:', error.message);
-      // ממשיכים בכל זאת - לא רוצים לחשוף שהמשתמש קיים
+      console.error('Failed to send password reset email:', error);
+      // מוחקים את הטוקן כי לא הצלחנו לשלוח את המייל
+      user.passwordResetToken = null;
+      user.passwordResetExpires = null;
+      await this.userRepository.save(user);
+
+      // זורקים שגיאה כדי שהמשתמש יידע שיש בעיה
+      throw new BadRequestException('שליחת המייל נכשלה. נסה שוב מאוחר יותר');
     }
 
-    return { message: 'אם האימייל קיים במערכת, נשלח אליך קישור לאיפוס סיסמה' };
+    return { message: 'נשלח אליך קישור לאיפוס סיסמה למייל' };
   }
 
   // איפוס הסיסמה בפועל
