@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 148779500
+      POSTGRES_PASSWORD: 123456
       POSTGRES_DB: shopping_app
     ports:
       - "5433:5432"
@@ -21,10 +21,6 @@ services:
       - "3000:3000"
     env_file:
       - ./shopping_server/.env
-    environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - FRONTEND_URL=http://161.97.66.168:5173 # מומלץ לעדכן גם כאן
     depends_on:
       - db
     restart: always
@@ -32,15 +28,11 @@ services:
   frontend:
     build:
       context: ./shopping_app
-      args:
-        # כאן קורה הקסם: זה מעביר את ה-IP לתוך תהליך הבנייה
-        - VITE_API_URL=http://161.97.66.168:3000 
     container_name: shopping-frontend
     ports:
       - "5173:5173"
-    # משאירים גם כאן ליתר ביטחון
     environment:
-      - VITE_API_URL=http://161.97.66.168:3000
+      - VITE_API_URL=http://localhost:3000
     depends_on:
       - backend
     restart: always

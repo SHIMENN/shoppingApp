@@ -54,7 +54,7 @@ export const useLogin = () => {
         await useCartStore.getState().syncCartWithServer();
       } catch (syncError) {
         // לוג השגיאה אבל לא לחסום את המשתמש
-        console.error('Failed to sync cart:', syncError);
+        console.error('אימייל או סיסמא לא תקינים', syncError);
       }
 
       // ניקוי הטופס
