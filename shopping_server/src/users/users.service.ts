@@ -20,12 +20,14 @@ export class UsersService {
 
   //יצירת משתמש פלוס הצפנת סיסמא
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const { password, ...userData } = createUserDto;
+    const { password, email, ...userData } = createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    // נרמול האימייל - המרה לאותיות קטנות
+    const normalizedEmail = email.toLowerCase().trim();
 
     const user = this.usersRepository.create({
       ...userData,
+      email: normalizedEmail,
       password: hashedPassword,
     });
 
@@ -39,7 +41,9 @@ export class UsersService {
     provider: string,
     profile: any,
   ): Promise<User> {
-    let user = await this.usersRepository.findOne({ where: { email } });
+    // נרמול האימייל - המרה לאותיות קטנות
+    const normalizedEmail = email.toLowerCase().trim();
+    let user = await this.usersRepository.findOne({ where: { email: normalizedEmail } });
     if (user) {
       if (provider === 'google' && !user.google_id) {
         user.google_id = profile.id;
@@ -48,7 +52,7 @@ export class UsersService {
       return user;
     }
     user = this.usersRepository.create({
-      email,
+      email: normalizedEmail,
       first_name: profile.firstName,
       last_name: profile.lastName,
       picture: profile.picture,
@@ -79,7 +83,9 @@ export class UsersService {
     return await this.usersRepository.findOne({ where: { user_id: userId } });
   }
   async findByEmail(email: string): Promise<User | null> {
-    return await this.usersRepository.findOne({ where: { email } });
+    // נרמול האימייל - המרה לאותיות קטנות
+    const normalizedEmail = email.toLowerCase().trim();
+    return await this.usersRepository.findOne({ where: { email: normalizedEmail } });
   }
 
   async update(userId: number, updateUserDto: UpdateUserDto) {

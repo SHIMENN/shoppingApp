@@ -18,7 +18,9 @@ export class PasswordResetService {
 
   // בקשה לאיפוס סיסמה
   async requestPasswordReset(email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    // נרמול האימייל - המרה לאותיות קטנות
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await this.userRepository.findOne({ where: { email: normalizedEmail } });
 
     // אפילו אם המשתמש לא קיים, נחזיר הודעה כללית (אבטחה)
     if (!user) {
@@ -37,11 +39,11 @@ export class PasswordResetService {
 
     // שליחת אימייל
     try {
-      this.logger.log(`Attempting to send password reset email to: ${email}`);
-      await this.emailService.sendPasswordResetEmail(email, resetToken);
-      this.logger.log(`Password reset email sent successfully to: ${email}`);
+      this.logger.log(`Attempting to send password reset email to: ${normalizedEmail}`);
+      await this.emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
+      this.logger.log(`Password reset email sent successfully to: ${normalizedEmail}`);
     } catch (error) {
-      this.logger.error(`Failed to send password reset email to ${email}:`, error.stack);
+      this.logger.error(`Failed to send password reset email to ${normalizedEmail}:`, error.stack);
       // מוחקים את הטוקן כי לא הצלחנו לשלוח את המייל
       user.passwordResetToken = null;
       user.passwordResetExpires = null;

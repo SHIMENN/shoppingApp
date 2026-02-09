@@ -48,7 +48,9 @@ export class EmailVerificationService {
 
   // שליחת אימייל אימות מחדש (למשתמש שכבר רשום)
   async resendVerificationEmail(email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    // נרמול האימייל - המרה לאותיות קטנות
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await this.userRepository.findOne({ where: { email: normalizedEmail } });
 
     if (!user) {
       throw new BadRequestException('משתמש לא נמצא');
