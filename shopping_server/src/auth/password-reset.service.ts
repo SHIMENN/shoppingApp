@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -8,6 +8,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PasswordResetService {
+  private readonly logger = new Logger(PasswordResetService.name);
+
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -35,10 +37,11 @@ export class PasswordResetService {
 
     // שליחת אימייל
     try {
+      this.logger.log(`Attempting to send password reset email to: ${email}`);
       await this.emailService.sendPasswordResetEmail(email, resetToken);
-      console.log(`Password reset email sent successfully to: ${email}`);
+      this.logger.log(`Password reset email sent successfully to: ${email}`);
     } catch (error) {
-      console.error('Failed to send password reset email:', error);
+      this.logger.error(`Failed to send password reset email to ${email}:`, error.stack);
       // מוחקים את הטוקן כי לא הצלחנו לשלוח את המייל
       user.passwordResetToken = null;
       user.passwordResetExpires = null;
