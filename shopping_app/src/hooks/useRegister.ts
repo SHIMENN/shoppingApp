@@ -1,9 +1,11 @@
 // hooks/useRegister.ts
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerApi } from '../services/authService';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const useRegister = () => {
   const [formData, setFormData] = useState({
@@ -42,11 +44,16 @@ export const useRegister = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleGoogleLogin = useCallback(() => {
+    window.location.href = `${API_URL}/auth/google`;
+  }, []);
+
   return {
     formData,
     showPassword,
     setShowPassword,
     handleSubmit,
-    updateField
+    updateField,
+    handleGoogleLogin
   };
 };

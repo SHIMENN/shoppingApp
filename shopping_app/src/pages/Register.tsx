@@ -3,9 +3,10 @@ import React from 'react';
 import { Form, Button, Card, InputGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useRegister } from '../hooks/useRegister';
+import SocialButtons from '../components/auth/SocialButtons';
 
 const Register: React.FC = () => {
-  const { formData, showPassword, setShowPassword, handleSubmit, updateField } = useRegister();
+  const { formData, showPassword, setShowPassword, handleSubmit, updateField, handleGoogleLogin } = useRegister();
 
   return (
     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '70vh' }}>
@@ -83,6 +84,10 @@ const Register: React.FC = () => {
             ✨ צור חשבון
           </Button>
         </Form>
+
+        <div className="text-center my-3 text-muted">או</div>
+
+        <SocialButtons onGoogleLogin={handleGoogleLogin} />
 
         <div className="text-center mt-4">
           כבר יש לך חשבון? <Link to="/login" className="text-decoration-none">התחבר כאן</Link>
