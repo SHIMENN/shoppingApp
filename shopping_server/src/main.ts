@@ -20,7 +20,7 @@ async function bootstrap() {
     origin:[
       process.env.FRONTEND_URL,
     'http://10.204.228.65:5173',
-    'http://localhost:5173'],
+    'https://161.97.66.168.nip.io/api'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true, //  ל בושח-Cookies!
   });
