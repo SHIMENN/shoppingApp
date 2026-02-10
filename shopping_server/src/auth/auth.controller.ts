@@ -7,10 +7,11 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { UsersService } from 'src/users/users.service';
 import { Throttle } from '@nestjs/throttler';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController  {
-    constructor (private authService:AuthService , private userService: UsersService){} 
+    constructor (private authService:AuthService , private userService: UsersService, private configService: ConfigService){} 
 
 
 
@@ -79,7 +80,7 @@ async loginWithCookie(
             req.user,
         );
         res.cookie('access_token', access_token, { httpOnly: true, path: '/', sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 });
-        res.redirect(`http://localhost:5173`);
+        res.redirect(this.configService.getOrThrow<string>('FRONTEND_URL'));
     }
       // 👇 בקשה לאיפוס סיסמה
   @Post('forgot-password')
